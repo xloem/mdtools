@@ -1,7 +1,9 @@
-import struct
+from . import namedfilestruct
 
-class Superblock:
-    header = dict(
+class Superblock(namedfilestruct.NamedFileStruct):
+    offset = 4096
+    endian = '='
+    fields = dict(
         # superblock identification area
         magic = 'I',
         major_version = 'I',
@@ -70,6 +72,11 @@ class Superblock:
 
         # device roles (positions in array) area follows, 1 per device
     )
-    dev_role = 'H' # 0xfffe means spare; 0xffff means faulty; others are position/role
-    def unpack(self, bytes):
+    dev_role_field = 'H' # 0xfffe means spare; 0xffff means faulty; others are position/role
+    def read(self, *params, **kwparams):
+        super().read(*params, **kwparams)
+        self.values['dev_roles'] = [
+            struct.unpack('H', self.fileobj.read(2))
+            for dev_idx in range(self.max_dev)
+        ]
 
