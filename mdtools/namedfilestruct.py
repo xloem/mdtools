@@ -25,7 +25,7 @@ class NamedFileStruct:
             key : val
             for key, val in zip(
                 self.fields.keys(), 
-                self.struct.iter_unpack(self.fileobj.read(self.struct.size))
+                self.struct.unpack(self.fileobj.read(self.struct.size))
             )
         }
     def __getattr__(self, name):

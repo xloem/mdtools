@@ -1,4 +1,5 @@
 from . import namedfilestruct
+import struct
 
 class Superblock(namedfilestruct.NamedFileStruct):
     offset = 4096
@@ -16,8 +17,8 @@ class Superblock(namedfilestruct.NamedFileStruct):
         pad0 = 'I', # always written zero
 
         # per-array identification and configuration area
-        set_uuid = '8B',
-        set_name = '32c',
+        set_uuid = '16s',
+        set_name = '32s',
         ctime = 'Q', # low 40 bits are seconds; high 24 bits are microseconds
         level = 'I', 
             # levels:
@@ -53,13 +54,13 @@ class Superblock(namedfilestruct.NamedFileStruct):
         recovery_offset = 'Q', # sectors after data_offset where recovery is at?
         dev_number = 'I', # device identifier number
         cnt_corrected_read = 'I', # number of read-errors corrected by rewriting
-        device_uuid = '16B', # uuid of the component device
+        device_uuid = '16s', # uuid of the component device
         devflags = 'B', 
             # flags
             # 1 WriteMostly1
             # ... ?
             # text on this section was cut off on right
-        pad2 = '7B', # written as zeros
+        pad2 = '7s', # written as zeros
 
         # array-state information area
         # offsert=0xc0, 64 bytes
@@ -68,17 +69,14 @@ class Superblock(namedfilestruct.NamedFileStruct):
         resync_offset = 'Q', # sync position after data_offset
         sb_csum = 'I', # up to devs[max_dev]
         max_dev = 'I', # number of devices in the array
-        pad3 = '32B', # always written zero
+        pad3 = '32s', # always written zero
 
         # device roles (positions in array) area follows, 1 per device
     )
     dev_role_field = 'H' # 0xfffe means spare; 0xffff means faulty; others are position/role
     def read(self, *params, **kwparams):
         super().read(*params, **kwparams)
-        self.values['dev_roles'] = [
-            struct.unpack('H', self.fileobj.read(2))
-            for dev_idx in range(self.max_dev)
-        ]
+        self.values['dev_roles'] = list(struct.iter_unpack('H', self.fileobj.read(2 * self.max_dev)))
 
 
 if __name__ == '__main__':
