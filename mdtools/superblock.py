@@ -80,3 +80,9 @@ class Superblock(namedfilestruct.NamedFileStruct):
             for dev_idx in range(self.max_dev)
         ]
 
+
+if __name__ == '__main__':
+    import sys
+    with open(sys.argv[-1], 'rb') as fileobj:
+        superblock = Superblock(fileobj)
+        print(superblock.values)
