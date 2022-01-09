@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" class="client-nojs">
+<head>
+<title>RAID superblock formats - Linux Raid Wiki</title>
+<meta charset="UTF-8" />
+<meta name="generator" content="MediaWiki 1.19.24" />
+<link rel="shortcut icon" href="/favicon.ico" />
+<link rel="search" type="application/opensearchdescription+xml" href="/opensearch_desc.php" title="Linux Raid Wiki (en)" />
+<link rel="EditURI" type="application/rsd+xml" href="https://raid.wiki.kernel.org/api.php?action=rsd" />
+<link rel="alternate" type="application/atom+xml" title="Linux Raid Wiki Atom feed" href="/index.php?title=Special:RecentChanges&amp;feed=atom" />
+<link rel="stylesheet" href="https://raid.wiki.kernel.org/load.php?debug=false&amp;lang=en&amp;modules=mediawiki.legacy.commonPrint%2Cshared%7Cskins.monobook&amp;only=styles&amp;skin=monobook&amp;*" />
+<!--[if IE 6]><link rel="stylesheet" href="/skins/monobook/IE60Fixes.css?303" media="screen" /><![endif]-->
+<!--[if IE 7]><link rel="stylesheet" href="/skins/monobook/IE70Fixes.css?303" media="screen" /><![endif]--><meta name="ResourceLoaderDynamicStyles" content="" />
+<style>a:lang(ar),a:lang(ckb),a:lang(fa),a:lang(kk-arab),a:lang(mzn),a:lang(ps),a:lang(ur){text-decoration:none}a.new,#quickbar a.new{color:#ba0000}
+
+/* cache key: korg_mediawiki_raid:resourceloader:filter:minify-css:7:c88e2bcd56513749bec09a7e29cb3ffa */
+</style>
+
+<script src="https://raid.wiki.kernel.org/load.php?debug=false&amp;lang=en&amp;modules=startup&amp;only=scripts&amp;skin=monobook&amp;*"></script>
+<script>if(window.mw){
+mw.config.set({"wgCanonicalNamespace":"","wgCanonicalSpecialPageName":false,"wgNamespaceNumber":0,"wgPageName":"RAID_superblock_formats","wgTitle":"RAID superblock formats","wgCurRevisionId":6065,"wgArticleId":1409,"wgIsArticle":true,"wgAction":"view","wgUserName":null,"wgUserGroups":["*"],"wgCategories":[],"wgBreakFrames":false,"wgPageContentLanguage":"en","wgSeparatorTransformTable":["",""],"wgDigitTransformTable":["",""],"wgRelevantPageName":"RAID_superblock_formats","wgRestrictionEdit":[],"wgRestrictionMove":[]});
+}</script><script>if(window.mw){
+mw.loader.implement("user.options",function($){mw.user.options.set({"ccmeonemails":0,"cols":80,"date":"default","diffonly":0,"disablemail":0,"disablesuggest":0,"editfont":"default","editondblclick":0,"editsection":1,"editsectiononrightclick":0,"enotifminoredits":0,"enotifrevealaddr":0,"enotifusertalkpages":1,"enotifwatchlistpages":0,"extendwatchlist":0,"externaldiff":0,"externaleditor":0,"fancysig":0,"forceeditsummary":0,"gender":"unknown","hideminor":0,"hidepatrolled":0,"highlightbroken":1,"imagesize":2,"justify":0,"math":1,"minordefault":0,"newpageshidepatrolled":0,"nocache":0,"noconvertlink":0,"norollbackdiff":0,"numberheadings":0,"previewonfirst":0,"previewontop":1,"quickbar":5,"rcdays":7,"rclimit":50,"rememberpassword":0,"rows":25,"searchlimit":20,"showhiddencats":0,"showjumplinks":1,"shownumberswatching":1,"showtoc":1,"showtoolbar":1,"skin":"monobook","stubthreshold":0,"thumbsize":2,"underline":2,"uselivepreview":0,"usenewrc":0,"watchcreations":0,"watchdefault":0,"watchdeletion":
+0,"watchlistdays":3,"watchlisthideanons":0,"watchlisthidebots":0,"watchlisthideliu":0,"watchlisthideminor":0,"watchlisthideown":0,"watchlisthidepatrolled":0,"watchmoves":0,"wllimit":250,"variant":"en","language":"en","searchNs0":true,"searchNs1":false,"searchNs2":false,"searchNs3":false,"searchNs4":false,"searchNs5":false,"searchNs6":false,"searchNs7":false,"searchNs8":false,"searchNs9":false,"searchNs10":false,"searchNs11":false,"searchNs12":false,"searchNs13":false,"searchNs14":false,"searchNs15":false});;},{},{});mw.loader.implement("user.tokens",function($){mw.user.tokens.set({"editToken":"+\\","watchToken":false});;},{},{});
+
+/* cache key: korg_mediawiki_raid:resourceloader:filter:minify-js:7:74a832f2292f1f4d40d425d223444e78 */
+}</script>
+<script>if(window.mw){
+mw.loader.load(["mediawiki.page.startup","mediawiki.legacy.wikibits","mediawiki.legacy.ajax"]);
+}</script>
+</head>
+<body class="mediawiki ltr sitedir-ltr ns-0 ns-subject page-RAID_superblock_formats skin-monobook action-view">
+<div id="globalWrapper">
+<div id="column-content"><div id="content">
+	<a id="top"></a>
+	
+	<h1 id="firstHeading" class="firstHeading"><span dir="auto">RAID superblock formats</span></h1>
+	<div id="bodyContent" class="mw-body">
+		<div id="siteSub">From Linux Raid Wiki</div>
+		<div id="contentSub"></div>
+		<div id="jump-to-nav" class="mw-jump">Jump to: <a href="#column-one">navigation</a>, <a href="#searchInput">search</a></div>
+		<!-- start content -->
+<div id="mw-content-text" lang="en" dir="ltr" class="mw-content-ltr"><table id="toc" class="toc"><tr><td><div id="toctitle"><h2>Contents</h2></div>
+<ul>
+<li class="toclevel-1 tocsection-1"><a href="#RAID_superblock_formats"><span class="tocnumber">1</span> <span class="toctext">RAID superblock formats</span></a>
+<ul>
+<li class="toclevel-2 tocsection-2"><a href="#A_Note_about_kernel_autodetection_of_different_superblock_formats"><span class="tocnumber">1.1</span> <span class="toctext">A Note about kernel autodetection of different superblock formats</span></a></li>
+<li class="toclevel-2 tocsection-3"><a href="#mdadm_v3.0_--_Adding_the_Concept_of_User-Space_Managed_External_Metadata_Formats"><span class="tocnumber">1.2</span> <span class="toctext">mdadm v3.0 -- Adding the Concept of User-Space Managed External Metadata Formats</span></a></li>
+<li class="toclevel-2 tocsection-4"><a href="#The_version-0.90_Superblock_Format"><span class="tocnumber">1.3</span> <span class="toctext">The version-0.90 Superblock Format</span></a></li>
+<li class="toclevel-2 tocsection-5"><a href="#The_version-1_Superblock_Format"><span class="tocnumber">1.4</span> <span class="toctext">The version-1 Superblock Format</span></a></li>
+<li class="toclevel-2 tocsection-6"><a href="#Sub-versions_of_the_version-1_superblock"><span class="tocnumber">1.5</span> <span class="toctext">Sub-versions of the version-1 superblock</span></a></li>
+<li class="toclevel-2 tocsection-7"><a href="#Converting_between_superblock_versions"><span class="tocnumber">1.6</span> <span class="toctext">Converting between superblock versions</span></a></li>
+<li class="toclevel-2 tocsection-8"><a href="#The_version-1_superblock_format_on-disk_layout"><span class="tocnumber">1.7</span> <span class="toctext">The version-1 superblock format on-disk layout</span></a>
+<ul>
+<li class="toclevel-3 tocsection-9"><a href="#Total_Size_of_superblock"><span class="tocnumber">1.7.1</span> <span class="toctext">Total Size of superblock</span></a></li>
+<li class="toclevel-3 tocsection-10"><a href="#Section:_Superblock.2F.22Magic-Number.22_Identification_area"><span class="tocnumber">1.7.2</span> <span class="toctext">Section: Superblock/"Magic-Number" Identification area</span></a></li>
+<li class="toclevel-3 tocsection-11"><a href="#Section:_Per-Array_Identification_.26_Configuration_area"><span class="tocnumber">1.7.3</span> <span class="toctext">Section: Per-Array Identification &amp; Configuration area</span></a></li>
+<li class="toclevel-3 tocsection-12"><a href="#Section:_RAID-Reshape_In-Process_Metadata_Storage.2FRecovery_area"><span class="tocnumber">1.7.4</span> <span class="toctext">Section: RAID-Reshape In-Process Metadata Storage/Recovery area</span></a></li>
+<li class="toclevel-3 tocsection-13"><a href="#Section:_This-Component-Device_Information_area"><span class="tocnumber">1.7.5</span> <span class="toctext">Section: This-Component-Device Information area</span></a></li>
+<li class="toclevel-3 tocsection-14"><a href="#Section:_Array-State_Information_area"><span class="tocnumber">1.7.6</span> <span class="toctext">Section: Array-State Information area</span></a></li>
+<li class="toclevel-3 tocsection-15"><a href="#Section:_Device-Roles_.28Positions-in-Array.29_area"><span class="tocnumber">1.7.7</span> <span class="toctext">Section: Device-Roles (Positions-in-Array) area</span></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</td></tr></table>
+<h1> <span class="mw-headline" id="RAID_superblock_formats">RAID superblock formats</span></h1>
+<p>Currently, the Linux kernel RAID subsystem recognizes two distinct variant superblocks.  
+</p><p>They are known as "version-0.90" and "version-1" Superblock formats.
+</p>
+<h2> <span class="mw-headline" id="A_Note_about_kernel_autodetection_of_different_superblock_formats">A Note about kernel autodetection of different superblock formats</span></h2>
+<p>Current Linux kernels (as of 2.6.28) can only autodetect (based on partition type being set to FD) arrays with superblock version 0.90.
+</p><p>The boot-loader LILO also can only boot from the version 0.90 superblock arrays. Alternative boot loaders,
+GRUB specifically, probably don't have this particular limitation.
+</p><p>As a workaround for the kernel-autodetection issue, several distributions, including Ubuntu and Fedora,
+circa early 2009, include init scripts that run any arrays that aren't started by auto-detect, which 
+can include arrays using the newer 1.x superblocks.
+</p><p>Using Fedora 9 as the example, the initscript file that does this is
+named /etc/rc.d/rc.sysinit. The command used is:
+</p>
+<pre>   # Start any MD RAID arrays that haven't been started yet
+   [ -f /etc/mdadm.conf -a -x /sbin/mdadm ] &amp;&amp; /sbin/mdadm -As --auto=yes --run
+</pre>
+<h2> <span class="mw-headline" id="mdadm_v3.0_--_Adding_the_Concept_of_User-Space_Managed_External_Metadata_Formats">mdadm v3.0 -- Adding the Concept of User-Space Managed External Metadata Formats</span></h2>
+<p>In the development packages for mdadm v3.0, a new concept is added to the traditional
+version-0.90 and version-1 superblocks. 
+</p>
+<pre>  Currently two such metadata formats are supported:
+    - DDF  - The SNIA standard format
+    - Intel Matrix - The metadata used by recent Intel ICH controlers.
+  
+  Externally managed metadata introduces the concept of a 'container'.
+  A container is a collection of (normally) physical devices which have
+  a common set of metadata.  A container is assembled as an md array, but
+  is left 'inactive'.
+</pre>
+<pre>  A container can contain one or more data arrays.  These are composed from
+  slices (partitions?) of various devices in the container.
+</pre>
+<pre>  For example, a 5 devices DDF set can container a RAID1 using the first
+  half of two devices, a RAID0 using the first half of the remain 3 devices,
+  and a RAID5 over the second half of all 5 devices.
+</pre>
+<h2> <span class="mw-headline" id="The_version-0.90_Superblock_Format">The version-0.90 Superblock Format</span></h2>
+<p>Though it used to be the default format of raid superblock during array creation on most distributions until 2009, the older version-0.90 superblock format has several limitations that limit its applicability for use on large arrays or arrays with many component devices.
+</p><p>The version-0.90 superblock limits the number of component devices within an array to 28, and limits each component device to a maximum size of 2TB on kernel version &lt;3.1 and 4TB on kernel version &gt;=3.1.  The data is 'endian' which prevents disk devices being moved between big and little endian machines.  There is no room for new metadata like hostnames.
+</p><p>The superblock is 4K long and is written into a 64K aligned block that starts at least 64K and less than 128K from the end of the device (i.e. to get the address of the superblock round the size of the device down to a multiple of 64K and then subtract 64K). The available size of each device is the amount of space before the super block, so between 64K and 128K is lost when a device in incorporated into an MD array.
+</p><p>All data the superblock contains is listed in the struct "<i>mdp_superblock_s</i>" in <i>md_p.h</i> in the mdadm source code.
+</p>
+<h2> <span class="mw-headline" id="The_version-1_Superblock_Format">The version-1 Superblock Format</span></h2>
+<p>The newer and well-supported version-1 superblock format is more-expansion friendly than the previous format.  It is the default as of v3.1.1.  More specifically, <tt>--metadata=1.2</tt> is used as of v3.1.2.
+</p><p>The version-1 superblock is capable of supporting arrays with 384+ component devices, and supports arrays with 64-bit sector lengths.  
+</p><p><i>Note: Current version-1 superblocks use an unsigned 32-bit number for the dev_number but only index the dev_numbers using an array of unsigned 16-bit numbers (so the theoretical range of device numbers in a single array is 0x0000 - 0xFFFD), which allows for 65,534 devices.</i>
+</p>
+<h2> <span class="mw-headline" id="Sub-versions_of_the_version-1_superblock">Sub-versions of the version-1 superblock</span></h2>
+<p>The "version-1" superblock format is currently used in three different "sub-versions".
+</p>
+<table class="wikitable" style="text-align: right;">
+<tr>
+<th> Sub-Version
+</th>
+<th> Superblock Position on Device
+</th></tr>
+<tr>
+<td style="text-align: center;"> 0.9
+</td>
+<td style="text-align: left;"> At the end of the device
+</td></tr>
+<tr>
+<td style="text-align: center;"> 1.0
+</td>
+<td style="text-align: left;"> At the end of the device
+</td></tr>
+<tr>
+<td style="text-align: center;"> 1.1
+</td>
+<td style="text-align: left;"> At the beginning of the device
+</td></tr>
+<tr>
+<td style="text-align: center;"> 1.2
+</td>
+<td style="text-align: left;"> 4K from the beginning of the device
+</td></tr></table>
+<p>The sub-versions differ primarily (solely?) in the location on each component device at which they actually store the superblock.
+</p><p>Putting the superblock at the end of the device is dangerous if you have any kind of auto-mounting/auto-detection/auto-activation of the raid contents; in some circumstances (in the case of blkid: if the superblock is damaged) the raid components could be detected as a valid filesystem (or other format) which may contain outdated data.  This will desynchronise the array and compromise the data.  The other important factor for superblock location is that PC bootloaders need to write to the first sector of a device to make it bootable.
+</p>
+<h2> <span class="mw-headline" id="Converting_between_superblock_versions">Converting between superblock versions</span></h2>
+<p>At the moment, there is no tool to convert between the different superblock versions. However, Neil Brown has posted a work-around to the linux-raid mailing list (see <a rel="nofollow" class="external autonumber" href="http://marc.info/?l=linux-raid&amp;m=130895284716309&amp;w=2">[1]</a>) that allows upgrading an existing RAID from a 0.90 superblock to a 1.0 superblock. By forcing to recreate the RAID with a newer metadata version, mdadm will overwrite an existing superblock with a 1.0 superblock. This method can only be used to upgrade from 0.90 to 1.0, because the new superblock will be placed at the same location on the drive and does not exceed the old superblock's size.
+</p><p>To upgrade the superblock version, perform the following steps:
+</p>
+<pre>   # Query the RAID's details such as chunk size, layout, etc.
+   mdadm --detail /dev/md0
+   # Stop the array
+   mdadm --stop /dev/md0
+   # Re-create the array with 1.0 metadata (ensure to specify all details, in case defaults have changed!)
+   mdadm --create /dev/md0 -l6 -n8 -c64 --layout=la --metadata=1.0 --assume-clean /dev/sda1 /dev/sdb1 /dev/sdc1 ....
+</pre>
+<p>When re-creating the array, it is important to specify all details according to the output of the first command. If a setting is left out and defaults have changed, this can cause the array to be re-created with different settings and your data may be lost. Back up your data first.
+</p><p>NOTE: After re-creating the array, its UUID will have changed. Remember to update mdadm.conf accordingly.
+</p>
+<h2> <span class="mw-headline" id="The_version-1_superblock_format_on-disk_layout">The version-1 superblock format on-disk layout</span></h2>
+<h3> <span class="mw-headline" id="Total_Size_of_superblock">Total Size of superblock</span></h3>
+<p>Total Size of superblock: 256 Bytes, plus 2 bytes per device in the array
+</p>
+<h3> <span class="mw-headline" id="Section:_Superblock.2F.22Magic-Number.22_Identification_area">Section: Superblock/"Magic-Number" Identification area</span></h3>
+<p>16 Bytes, Offset 0-15 (0x00 - 0x0F)
+</p>
+<table border="1">
+<tr>
+<th>Offset (Hex)</th>
+<th>Offset (Dec)</th>
+<th>Length<br />(in bytes)</th>
+<th>Field Name</th>
+<th>Usage/Meaning</th>
+<th>Data Type</th>
+<th>Data Value</th>
+<th>Notes</th>
+</tr>
+<tr>
+<td>0x00 - 0x03</td>
+<td>0 - 3</td>
+<td>4</td>
+<td>magic</td>
+<td>"Magic Number"<br />(Superblock ID)</td>
+<td>__u32</td>
+<td>0xa92b4efc<br />(little-endian)</td>
+<td></td>
+</tr>
+<tr>
+<td>0x04 - 0x07</td>
+<td>4 - 7</td>
+<td>4</td>
+<td>major_version</td>
+<td>Major Version<br />of the Superblock</td>
+<td>__u32</td>
+<td>1</td>
+<td></td>
+</tr>
+<tr>
+<td>0x08 - 0x0B</td>
+<td>8 - 11</td>
+<td>4</td>
+<td>feature_map</td>
+<td>Feature Map - which extended features (such as volume bitmaps, recovery, or reshape) are in use on this array</td>
+<td>__u32</td>
+<td>0<br />Bit-Mapped Field<br /><br />
+ <table border="1">
+  <tr><th>Bit Offset</th><th>Bit Value</th><th>Meaning</th></tr>
+  <tr><td>0</td><td>1</td><td>RAID Bitmap is used</td></tr>
+  <tr><td>1</td><td>2</td><td>RAID Recovery is in progress<br />(See "recovery_offset")</td></tr>
+  <tr><td>2</td><td>4</td><td>RAID Reshape is in progress</td></tr>
+  <tr><td>3</td><td>8</td><td>undefined/reserved (0)</td></tr>
+  <tr><td>4</td><td>16</td><td>undefined/reserved (0)</td></tr>
+  <tr><td>5</td><td>32</td><td>undefined/reserved (0)</td></tr>
+  <tr><td>6</td><td>64</td><td>undefined/reserved (0)</td></tr>
+  <tr><td>7</td><td>128</td><td>undefined/reserved (0)</td></tr>
+ </table>
+</td>
+<td>&#160;</td>
+</tr>
+<tr>
+<td>0x0C - 0x0F</td>
+<td>12 - 15</td>
+<td>4</td>
+<td>pad0</td>
+<td>Padding Block 0</td>
+<td>__u32</td>
+<td>0</td>
+<td>Always set to<br />zero when writing</td>
+</tr>
+</table>
+<p><br />
+</p>
+<h3> <span class="mw-headline" id="Section:_Per-Array_Identification_.26_Configuration_area">Section: Per-Array Identification &amp; Configuration area</span></h3>
+<p>84 Bytes, Offset 16-99 (0x10 - 0x63)
+</p>
+<table border="1">
+<tr>
+<th>Offset (Hex)</th>
+<th>Offset (Dec)</th>
+<th>Length<br />(in bytes)</th>
+<th>Field Name</th>
+<th>Usage/Meaning</th>
+<th>Data Type</th>
+<th>Data Value</th>
+<th>Notes</th>
+</tr>
+<tr>
+<td>0x10 - 0x1F</td>
+<td>16 - 31</td>
+<td>16</td>
+<td>set_uuid</td>
+<td>UUID for the Array(?)</td>
+<td>__u8[16]</td>
+<td>Set by user-space<br />formatting utility (mdadm, for example).</td>
+<td></td>
+</tr>
+<tr>/
+<td>0x20 - 0x3F</td>
+<td>32 - 63</td>
+<td>32</td>
+<td>set_name</td>
+<td>Name for the Array(?)</td>
+<td>char[32]</td>
+<td>Set and used by<br />user-space utilities (mdadm, for example).</td>
+<td>Nt</td>
+</tr>
+<tr>
+<td>0x40 - 0x47</td>
+<td>64 - 71</td>
+<td>8</td>
+<td>ctime</td>
+<td>Creation Time</td>
+<td>__u64</td>
+<td>low 40-bits are seconds<br />high 24-bits are microseconds</td>
+<td></td>
+</tr>
+<tr>
+<td>0x48 - 0x4B</td>
+<td>72 - 75</td>
+<td>4</td>
+<td>level</td>
+<td>RAID Level<br />of the Array</td>
+<td>__u32</td>
+<td>
+ <table border="1">
+  <tr><th>Value</th><th>Meaning</th></tr>
+  <tr><td>-4</td><td>Multi-Path</td></tr>
+  <tr><td>-1</td><td>Linear</td></tr>
+  <tr><td>0</td><td>RAID-0 (Striped)</td></tr>
+  <tr><td>1</td><td>RAID-1 (Mirrored)</td></tr>
+  <tr><td>4</td><td>RAID-4 (Striped with Dedicated Block-Level Parity)</td></tr>
+  <tr><td>5</td><td>RAID-5 (Striped with Distributed Parity)</td></tr>
+  <tr><td>6</td><td>RAID-6 (Striped with Dual Parity)</td></tr>
+  <tr><td>A</td><td>RAID-10 (Mirror of stripes)</td></tr>
+ </table>
+</td>
+<td>Note: mdadm versions (as of v2.6.4) limit RAID-6 (creation) to 256 disks or less.</td>
+</tr>
+<tr>
+<td>0x4C - 0x4F</td>
+<td>76 - 79</td>
+<td>4</td>
+<td>layout</td>
+<td>layout of array<br />(RAID5(and 6? and raid 10?) only)</td>
+<td>__u32</td>
+<td>
+ <table border="1">
+  <tr><th>Value</th><th>Meaning</th></tr>
+  <tr><td>0</td><td>left asymmetric</td></tr>
+  <tr><td>1</td><td>right asymmetric</td></tr>
+  <tr><td>2</td><td>left symmetric (default)</td></tr>
+  <tr><td>3</td><td>right symmetric</td></tr>
+  <tr><td>01 02 01 00</td><td>Raid-10 Offset2</td></tr>
+ </table>
+</td>
+<td>Controls the relative arrangement of data and parity blocks on the disks.
+</td>
+</tr>
+<tr>
+<td>0x50 - 0x57</td>
+<td>80 - 87</td>
+<td>8</td>
+<td>size</td>
+<td>used-size of component devices</td>
+<td>__u64</td>
+<td>size of component devices<br />(in # of 512-byte sectors)</td>
+<td></td>
+</tr>
+<tr>
+<td>0x58 - 0x5B</td>
+<td>88 - 91</td>
+<td>4</td>
+<td>chunksize</td>
+<td>chunk-size of the array</td>
+<td>__u32</td>
+<td>chunk-size of the array<br />(in # of 512-byte sectors)</td>
+<td>
+<p>default is 64K? for raid levels 0, 10, 4, 5, and 6<br />
+chunksize not used in raid levels 1, linear, and multi-path<br />
+<br />
+<b>Note:</b> During creation this appears to be created as a multiple of 1024 rather than 512.
+</p>
+</td>
+</tr>
+<tr>
+<td>0x5C - 0x5F</td>
+<td>92 - 95</td>
+<td>4</td>
+<td>raid_disks</td>
+<td>(?)number of disks in array(?)</td>
+<td>__u32</td>
+<td>#</td>
+<td>
+<p>raid4 requires a minimum of 2 member devs<br />
+raid5 requires a minimum of 2 member devs<br />
+raid6 requires a minimum of 4 member devs<br />
+raid6 limited to a max of 256 member devs<br />
+</p>
+</td>
+</tr>
+<tr>
+<td>0x60 - 0x63</td>
+<td>96 - 99</td>
+<td>4</td>
+<td>bitmap_offset</td>
+<td># of sectors after superblock<br />that bitmap starts<br />(See note about signed value)</td>
+<td>__u32</td>
+<td>(signed)</td>
+<td><b>Note:</b>This is only meaningful if feature_map[0] is set.<br /><br />This is a Signed value which allows the bitmap to appear physically before the superblock on the disk.</td>
+</tr>
+</table>
+<p><br />
+</p>
+<h3> <span class="mw-headline" id="Section:_RAID-Reshape_In-Process_Metadata_Storage.2FRecovery_area">Section: RAID-Reshape In-Process Metadata Storage/Recovery area</span></h3>
+<p>28 Bytes, Offset 100-127 (0x64 - 0x7F)
+<br />
+(Note: Only contains valid data if feature_map bit '4' is set)
+</p>
+<table border="1">
+<tr>
+<th>Offset (Hex)</th>
+<th>Offset (Dec)</th>
+<th>Length<br />(in bytes)</th>
+<th>Field Name</th>
+<th>Usage/Meaning</th>
+<th>Data Type</th>
+<th>Data Value</th>
+<th>Notes</th>
+</tr>
+<tr>
+<td>0x64 - 0x67</td>
+<td>100 - 103</td>
+<td>4</td>
+<td>new_level</td>
+<td>the new RAID level being reshaped-to</td>
+<td>__u32</td>
+<td><i>see </i> <b>level</b> <i> field (above)</i></td>
+<td>&#160;</td>
+</tr>
+<tr>
+<td>0x68 - 0x6F</td>
+<td>104 - 111</td>
+<td>8</td>
+<td>reshape_position</td>
+<td>Next address of the array to reshape</td>
+<td>__u64</td>
+<td>current position of the reshape operation</td>
+<td>&#160;</td>
+</tr><tr>
+</tr>
+<td>0x70 - 0x73</td>
+<td>112 - 115</td>
+<td>4</td>
+<td>delta_disks</td>
+<td>this holds the change<br />in # of raid disks</td>
+<td>__u32</td>
+<td>change in # of raid disks</td>
+<td>&#160;</td>
+<p>&lt;/tr&gt;
+</p>
+<tr>
+<td>0x74 - 0x77</td>
+<td>116 - 119</td>
+<td>4</td>
+<td>new_layout</td>
+<td>new layout for array</td>
+<td>__u32</td>
+<td><i>see </i> <b>layout</b> <i> field (above)</i></td>
+<td>&#160;</td>
+</tr>
+<tr>
+<td>0x78 - 0x7B</td>
+<td>120 - 123</td>
+<td>4</td>
+<td>new_chunk</td>
+<td>new chunk size</td>
+<td>__u32</td>
+<td><i>see </i> <b>chunksize</b> <i>field (above)</i></td>
+<td>&#160;</td>
+</tr>
+<tr>
+<td>0x7C - 0x7F</td>
+<td>124 - 127</td>
+<td>4</td>
+<td>pad1</td>
+<td>Padding Block #1</td>
+<td>__u8[4]</td>
+<td>0</td>
+<td>Always set to<br />zero when writing</td>
+</tr>
+</table>
+<p><br />
+<br />
+</p>
+<h3> <span class="mw-headline" id="Section:_This-Component-Device_Information_area">Section: This-Component-Device Information area</span></h3>
+<p>64 Bytes, Offset 128-191 (0x80 - 0xbf)
+</p>
+<table border="1">
+<tr>
+<th>Offset (Hex)</th>
+<th>Offset (Dec)</th>
+<th>Length<br />(in bytes)</th>
+<th>Field Name</th>
+<th>Usage/Meaning</th>
+<th>Data Type</th>
+<th>Data Value</th>
+<th>Notes</th>
+</tr>
+<tr>
+<td>0x80 - 0x87</td>
+<td>128 - 135</td>
+<td>8</td>
+<td>data_offset</td>
+<td>the sector # upon which data starts</td>
+<td>__u64</td>
+<td>sector # where data begins<br />(0 if the superblock is at the end; the reserved space for the superblock and bitmap otherwise)</td>
+<td></td>
+</tr>
+<tr>
+<td>0x88 - 0x8F</td>
+<td>136 - 143</td>
+<td>8</td>
+<td>data_size</td>
+<td>sectors in the device<br />that are used for data</td>
+<td>__u64</td>
+<td># of sectors that can be used for data</td>
+<td></td>
+</tr>
+<tr>
+<td>0x90 - 0x97</td>
+<td>144 - 151</td>
+<td>8</td>
+<td>super_offset</td>
+<td># of the sector upon<br />which this superblock starts</td>
+<td>__u64</td>
+<td># of the sector upon<br />which this superblock starts</td>
+<td></td>
+</tr>
+<tr>
+<td>0x98 - 0x9F</td>
+<td>152 - 159</td>
+<td>8</td>
+<td>recovery_offset</td>
+<td>sectors before this offset<br />(from data_offset)<br />have been recovered</td>
+<td>__u64</td>
+<td>sector #</td>
+<td></td>
+</tr>
+<tr>
+<td>0xA0 - 0xA3</td>
+<td>160 - 163</td>
+<td>4</td>
+<td>dev_number</td>
+<td>Fm</td>
+<td>__u32</td>
+<td>Permanent identifier of this device (Not its role in RAID(?))</td>
+<td>This is shown as "Array Slot" by the mdadm v2.x "--examine" command
+<p><i><b>Note: This is a 32-bit unsigned integer, but the Device-Roles (Positions-in-Array) Area indexes these values using only 16-bit unsigned integers, and reserves the values 0xFFFF as spare and 0xFFFE as faulty, so only 65,534 devices per array are possible.</b></i>
+</p>
+</td>
+</tr>
+<tr>
+<td>0xA4 - 0xA7</td>
+<td>164 - 167</td>
+<td>4</td>
+<td>cnt_corrected_read</td>
+<td>Number of read-errors that were corrected by re-writing</td>
+<td>__u32</td>
+<td>Dv</td>
+<td></td>
+</tr>
+<tr>
+<td>0xA8 - 0xB7</td>
+<td>168 - 183</td>
+<td>16</td>
+<td>device_uuid</td>
+<td>UUID of the component device</td>
+<td>__u8[16]</td>
+<td></td>
+<td>Set by User-Space<br />Ignored by kernel</td>
+</tr>
+<tr>
+<td>0xB8</td>
+<td>184</td>
+<td>1</td>
+<td>devflags</td>
+<td>Per-Device Flags<br />(Bit-Mapped Field)</td>
+<td>__u8</td>
+<td>Bit-Mapped Field<br /><br />
+ <table border="1">
+  <tr><th>Bit Offset</th><th>Bit Value</th><th>Meaning</th></tr>
+  <tr><td>0</td><td>1</td><td>WriteMostly1</td></tr>
+  <tr><td>2</td><td>2</td><td>(?)</td></tr>
+  <tr><td>2</td><td>4</td><td>(?)</td></tr>
+  <tr><td>3</td><td>8</td><td>(?)</td></tr>
+  <tr><td>4</td><td>16</td><td>(?)</td></tr>
+  <tr><td>5</td><td>32</td><td>(?)</td></tr>
+  <tr><td>6</td><td>64</td><td>(?)</td></tr>
+  <tr><td>7</td><td>128</td><td>(?)</td></tr>
+ </table>
+</td>
+<td>WriteMostly1 indicates that this device should only be updated on writes, not read from. (Useful with slow devices in RAID1 arrays?)</td>
+</tr>
+<tr>
+<td>0xB9 - 0xBF</td>
+<td>185 - 191</td>
+<td>7</td>
+<td>pad2</td>
+<td>Padding block 2</td>
+<td>__u8[7]</td>
+<td>0</td>
+<td>Always set to<br />zero when writing</td>
+</tr>
+</table>
+<p><br />
+</p>
+<h3> <span class="mw-headline" id="Section:_Array-State_Information_area">Section: Array-State Information area</span></h3>
+<p>64 Bytes, Offset 192-255 (0xC0 - 0xFF)
+</p>
+<table border="1">
+<tr>
+<th>Offset (Hex)</th>
+<th>Offset (Dec)</th>
+<th>Length<br />(in bytes)</th>
+<th>Field Name</th>
+<th>Usage/Meaning</th>
+<th>Data Type</th>
+<th>Data Value</th>
+<th>Notes</th>
+</tr>
+<tr>
+<td>0xC0 - 0xC7</td>
+<td>192 - 199</td>
+<td>8</td>
+<td>utime</td>
+<td>Time of last superblock update</td>
+<td>__u64</td>
+<td>low 40-bits are seconds<br />high 24-bits are microseconds</td>
+<td>Updated whenever the superblock is updated.</td>
+</tr>
+<tr>
+<td>0xC8 - 0xCF</td>
+<td>200 - 207</td>
+<td>8</td>
+<td>events</td>
+<td>Event Count for the Array</td>
+<td>__u64</td>
+<td>#</td>
+<td>Incremented whenever the superblock is updated.<br /><br />Used by mdadm in re-assembly to detect failed/out-of-sync  component devices.</td>
+</tr>
+<tr>
+<td>0xD0 - 0xD7</td>
+<td>208 - 215</td>
+<td>8</td>
+<td>resync_offset</td>
+<td>Offsets before this one (starting from data_offset) are 'known' to be in sync.</td>
+<td>__u64</td>
+<td>offset #</td>
+<td></td>
+</tr>
+<tr>
+<td>0xD8 - 0xDB</td>
+<td>216 - 219</td>
+<td>4</td>
+<td>sb_csum</td>
+<td>Checksum of this superblock up to devs[max_dev]</td>
+<td>__u32</td>
+<td>#</td>
+<td>This value will be different for each component device's superblock.</td>
+</tr>
+<tr>
+<td>0xDC - 0xDF</td>
+<td>220 - 223</td>
+<td>4</td>
+<td>max_dev</td>
+<td>How many devices are part of (or related to) the array</td>
+<td>__u32</td>
+<td>#</td>
+<td></td>
+</tr>
+<tr>
+<td>0xE0 - 0xFF</td>
+<td>224 - 255</td>
+<td>32</td>
+<td>pad3</td>
+<td>Padding Block 3</td>
+<td>__u8[32]</td>
+<td>0</td>
+<td>Always set to<br />
+zero when writing</td>
+</tr>
+</table>
+<p><br />
+</p>
+<h3> <span class="mw-headline" id="Section:_Device-Roles_.28Positions-in-Array.29_area">Section: Device-Roles (Positions-in-Array) area</span></h3>
+<p>Length: Variable number of bytes (but at least 768 bytes?) 
+<br />
+2 Bytes per device in the array, including both spare-devices and faulty-devices
+</p>
+<table border="1">
+<tr><th colspan="8">Section: Device-Roles (Positions-in-Array) area</th></tr>
+<tr><th colspan="8">(Variable length - 2 Bytes per Device in Array (including Spares/Faulty-Devs)</th></tr>
+<tr><td colspan="8">&#160;</td></tr>
+<tr>
+<th>Offset (Hex)</th>
+<th>Offset (Dec)</th>
+<th>Length<br />(in bytes)</th>
+<th>Field Name</th>
+<th>Usage/Meaning</th>
+<th>Data Type</th>
+<th>Data Value</th>
+<th>Notes</th>
+</tr>
+<tr><th colspan="8">768 (or more?) Bytes, Offset 256-1023 (0x100 - 0x3FF)</th></tr>
+<tr>
+<td>0x100 - 0x101</td>
+<td>256 - 257</td>
+<td>2</td>
+<td>dev_roles</td>
+<td>Fm</td>
+<td>__u16</td>
+<td>Role or Position of first device in the array.<br />0xFFFF means "spare".<br />0xFFFE means "faulty".</td>
+<td></td>
+</tr>
+<tr>
+<td>0x102 - 0x103</td>
+<td>258 - 259</td>
+<td>2</td>
+<td>dev_roles</td>
+<td>Fm</td>
+<td>__u16</td>
+<td>Role or Position of second device in the array.</td>
+<td></td>
+</tr>
+<tr><td colspan="8">...</td></tr>
+</table>
+
+<!-- 
+NewPP limit report
+Preprocessor node count: 73/1000000
+Post‐expand include size: 0/2097152 bytes
+Template argument size: 0/2097152 bytes
+Expensive parser function count: 0/100
+-->
+
+<!-- Saved in parser cache with key korg_mediawiki_raid:pcache:idhash:1409-0!*!*!!en!*!* and timestamp 20220109000706 -->
+</div><div class="printfooter">
+Retrieved from "<a href="https://raid.wiki.kernel.org/index.php?title=RAID_superblock_formats&amp;oldid=6065">https://raid.wiki.kernel.org/index.php?title=RAID_superblock_formats&amp;oldid=6065</a>"</div>
+		<div id='catlinks' class='catlinks catlinks-allhidden'></div>		<!-- end content -->
+				<div class="visualClear"></div>
+	</div>
+</div></div>
+<div id="column-one">
+	<div id="p-cactions" class="portlet">
+		<h5>Views</h5>
+		<div class="pBody">
+			<ul>
+				<li id="ca-nstab-main" class="selected"><a href="/index.php/RAID_superblock_formats" primary="1" context="subject" title="View the content page [c]" accesskey="c">Page</a></li>
+				<li id="ca-talk"><a href="/index.php/Talk:RAID_superblock_formats" primary="1" context="talk" title="Discussion about the content page [t]" accesskey="t">Discussion</a></li>
+				<li id="ca-viewsource"><a href="/index.php?title=RAID_superblock_formats&amp;action=edit" primary="1" title="This page is protected.&#10;You can view its source [e]" accesskey="e">View source</a></li>
+				<li id="ca-history"><a href="/index.php?title=RAID_superblock_formats&amp;action=history" rel="archives" title="Past revisions of this page [h]" accesskey="h">History</a></li>
+			</ul>
+		</div>
+	</div>
+	<div class="portlet" id="p-personal">
+		<h5>Personal tools</h5>
+		<div class="pBody">
+			<ul>
+				<li id="pt-login"><a href="/index.php?title=Special:UserLogin&amp;returnto=RAID+superblock+formats" title="You are encouraged to log in; however, it is not mandatory [o]" accesskey="o">Log in / create account</a></li>
+			</ul>
+		</div>
+	</div>
+	<div class="portlet" id="p-logo">
+<a href="/index.php/Linux_Raid" style="background-image: url(/skins/common/images-raid/wiki.png);" title="Visit the main page"></a>
+	</div>
+	<div class="generated-sidebar portlet" id="p-navigation">
+		<h5>Navigation</h5>
+		<div class='pBody'>
+			<ul>
+				<li id="n-mainpage-description"><a href="/index.php/Linux_Raid" title="Visit the main page [z]" accesskey="z">Main page</a></li>
+				<li id="n-recentchanges"><a href="/index.php/Special:RecentChanges" title="A list of recent changes in the wiki [r]" accesskey="r">Recent changes</a></li>
+				<li id="n-randompage"><a href="/index.php/Special:Random" title="Load a random page [x]" accesskey="x">Random page</a></li>
+			</ul>
+		</div>
+	</div>
+	<div id="p-search" class="portlet">
+		<h5><label for="searchInput">Search</label></h5>
+		<div id="searchBody" class="pBody">
+			<form action="/index.php" id="searchform">
+				<input type='hidden' name="title" value="Special:Search"/>
+				<input type="search" name="search" title="Search Linux Raid Wiki [f]" accesskey="f" id="searchInput" />
+				<input type="submit" name="go" value="Go" title="Go to a page with this exact name if exists" id="searchGoButton" class="searchButton" />&#160;
+				<input type="submit" name="fulltext" value="Search" title="Search the pages for this text" id="mw-searchButton" class="searchButton" />
+			</form>
+		</div>
+	</div>
+	<div class="portlet" id="p-tb">
+		<h5>Tools</h5>
+		<div class="pBody">
+			<ul>
+				<li id="t-whatlinkshere"><a href="/index.php/Special:WhatLinksHere/RAID_superblock_formats" title="A list of all wiki pages that link here [j]" accesskey="j">What links here</a></li>
+				<li id="t-recentchangeslinked"><a href="/index.php/Special:RecentChangesLinked/RAID_superblock_formats" title="Recent changes in pages linked from this page [k]" accesskey="k">Related changes</a></li>
+				<li id="t-specialpages"><a href="/index.php/Special:SpecialPages" title="A list of all special pages [q]" accesskey="q">Special pages</a></li>
+				<li><a href="/index.php?title=RAID_superblock_formats&amp;printable=yes" rel="alternate">Printable version</a></li>
+				<li id="t-permalink"><a href="/index.php?title=RAID_superblock_formats&amp;oldid=6065" title="Permanent link to this revision of the page">Permanent link</a></li>
+			</ul>
+		</div>
+	</div>
+</div><!-- end of the left (by default at least) column -->
+<div class="visualClear"></div>
+<div id="footer">
+	<div id="f-poweredbyico">
+		<a href="//www.mediawiki.org/"><img src="/skins/common/images/poweredby_mediawiki_88x31.png" alt="Powered by MediaWiki" width="88" height="31" /></a>
+	</div>
+	<ul id="f-list">
+		<li id="lastmod"> This page was last modified on 22 May 2018, at 16:27.</li>
+		<li id="privacy"><a href="/index.php/Linux_Raid_Wiki:Privacy_policy" title="Linux Raid Wiki:Privacy policy">Privacy policy</a></li>
+		<li id="about"><a href="/index.php/Linux_Raid_Wiki:About" title="Linux Raid Wiki:About">About Linux Raid Wiki</a></li>
+		<li id="disclaimer"><a href="/index.php/Linux_Raid_Wiki:General_disclaimer" title="Linux Raid Wiki:General disclaimer">Disclaimers</a></li>
+	</ul>
+</div>
+</div>
+<script>if(window.mw){
+mw.loader.load(["mediawiki.user","mediawiki.page.ready"], null, true);
+}</script>
+<!-- Served in 0.202 secs. --></body></html>
