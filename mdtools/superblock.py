@@ -67,7 +67,7 @@ class Superblock(namedfilestruct.NamedFileStruct):
         utime = 'Q', # time of last superblock update.  high 24-bits are microseconds
         events = 'Q', # event count, incremented whenever superblock updated, to detect sync'd disks
         resync_offset = 'Q', # sync position after data_offset
-        sb_csum = 'I', # up to devs[max_dev]
+        sb_cksum = 'I', # up to devs[max_dev]
         max_dev = 'I', # number of devices in the array
         pad3 = '32s', # always written zero
 
@@ -76,6 +76,7 @@ class Superblock(namedfilestruct.NamedFileStruct):
     dev_role_field = 'H' # 0xfffe means spare; 0xffff means faulty; others are position/role
     def read(self, *params, **kwparams):
         super().read(*params, **kwparams)
+        assert self.values['magic'] == 0xa92b4efc
         self.values['dev_roles'] = list(struct.iter_unpack('H', self.fileobj.read(2 * self.max_dev)))
 
 
