@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" class="client-nojs">
+<head>
+<title>Irreversible mdadm failure recovery - Linux Raid Wiki</title>
+<meta charset="UTF-8" />
+<meta name="generator" content="MediaWiki 1.19.24" />
+<link rel="shortcut icon" href="/favicon.ico" />
+<link rel="search" type="application/opensearchdescription+xml" href="/opensearch_desc.php" title="Linux Raid Wiki (en)" />
+<link rel="EditURI" type="application/rsd+xml" href="https://raid.wiki.kernel.org/api.php?action=rsd" />
+<link rel="alternate" type="application/atom+xml" title="Linux Raid Wiki Atom feed" href="/index.php?title=Special:RecentChanges&amp;feed=atom" />
+<link rel="stylesheet" href="https://raid.wiki.kernel.org/load.php?debug=false&amp;lang=en&amp;modules=mediawiki.legacy.commonPrint%2Cshared%7Cskins.monobook&amp;only=styles&amp;skin=monobook&amp;*" />
+<!--[if IE 6]><link rel="stylesheet" href="/skins/monobook/IE60Fixes.css?303" media="screen" /><![endif]-->
+<!--[if IE 7]><link rel="stylesheet" href="/skins/monobook/IE70Fixes.css?303" media="screen" /><![endif]--><meta name="ResourceLoaderDynamicStyles" content="" />
+<style>a:lang(ar),a:lang(ckb),a:lang(fa),a:lang(kk-arab),a:lang(mzn),a:lang(ps),a:lang(ur){text-decoration:none}a.new,#quickbar a.new{color:#ba0000}
+
+/* cache key: korg_mediawiki_raid:resourceloader:filter:minify-css:7:c88e2bcd56513749bec09a7e29cb3ffa */
+</style>
+
+<script src="https://raid.wiki.kernel.org/load.php?debug=false&amp;lang=en&amp;modules=startup&amp;only=scripts&amp;skin=monobook&amp;*"></script>
+<script>if(window.mw){
+mw.config.set({"wgCanonicalNamespace":"","wgCanonicalSpecialPageName":false,"wgNamespaceNumber":0,"wgPageName":"Irreversible_mdadm_failure_recovery","wgTitle":"Irreversible mdadm failure recovery","wgCurRevisionId":6231,"wgArticleId":2831,"wgIsArticle":true,"wgAction":"view","wgUserName":null,"wgUserGroups":["*"],"wgCategories":[],"wgBreakFrames":false,"wgPageContentLanguage":"en","wgSeparatorTransformTable":["",""],"wgDigitTransformTable":["",""],"wgRelevantPageName":"Irreversible_mdadm_failure_recovery","wgRestrictionEdit":[],"wgRestrictionMove":[]});
+}</script><script>if(window.mw){
+mw.loader.implement("user.options",function($){mw.user.options.set({"ccmeonemails":0,"cols":80,"date":"default","diffonly":0,"disablemail":0,"disablesuggest":0,"editfont":"default","editondblclick":0,"editsection":1,"editsectiononrightclick":0,"enotifminoredits":0,"enotifrevealaddr":0,"enotifusertalkpages":1,"enotifwatchlistpages":0,"extendwatchlist":0,"externaldiff":0,"externaleditor":0,"fancysig":0,"forceeditsummary":0,"gender":"unknown","hideminor":0,"hidepatrolled":0,"highlightbroken":1,"imagesize":2,"justify":0,"math":1,"minordefault":0,"newpageshidepatrolled":0,"nocache":0,"noconvertlink":0,"norollbackdiff":0,"numberheadings":0,"previewonfirst":0,"previewontop":1,"quickbar":5,"rcdays":7,"rclimit":50,"rememberpassword":0,"rows":25,"searchlimit":20,"showhiddencats":0,"showjumplinks":1,"shownumberswatching":1,"showtoc":1,"showtoolbar":1,"skin":"monobook","stubthreshold":0,"thumbsize":2,"underline":2,"uselivepreview":0,"usenewrc":0,"watchcreations":0,"watchdefault":0,"watchdeletion":
+0,"watchlistdays":3,"watchlisthideanons":0,"watchlisthidebots":0,"watchlisthideliu":0,"watchlisthideminor":0,"watchlisthideown":0,"watchlisthidepatrolled":0,"watchmoves":0,"wllimit":250,"variant":"en","language":"en","searchNs0":true,"searchNs1":false,"searchNs2":false,"searchNs3":false,"searchNs4":false,"searchNs5":false,"searchNs6":false,"searchNs7":false,"searchNs8":false,"searchNs9":false,"searchNs10":false,"searchNs11":false,"searchNs12":false,"searchNs13":false,"searchNs14":false,"searchNs15":false});;},{},{});mw.loader.implement("user.tokens",function($){mw.user.tokens.set({"editToken":"+\\","watchToken":false});;},{},{});
+
+/* cache key: korg_mediawiki_raid:resourceloader:filter:minify-js:7:74a832f2292f1f4d40d425d223444e78 */
+}</script>
+<script>if(window.mw){
+mw.loader.load(["mediawiki.page.startup","mediawiki.legacy.wikibits","mediawiki.legacy.ajax"]);
+}</script>
+</head>
+<body class="mediawiki ltr sitedir-ltr ns-0 ns-subject page-Irreversible_mdadm_failure_recovery skin-monobook action-view">
+<div id="globalWrapper">
+<div id="column-content"><div id="content">
+	<a id="top"></a>
+	
+	<h1 id="firstHeading" class="firstHeading"><span dir="auto">Irreversible mdadm failure recovery</span></h1>
+	<div id="bodyContent" class="mw-body">
+		<div id="siteSub">From Linux Raid Wiki</div>
+		<div id="contentSub"></div>
+		<div id="jump-to-nav" class="mw-jump">Jump to: <a href="#column-one">navigation</a>, <a href="#searchInput">search</a></div>
+		<!-- start content -->
+<div id="mw-content-text" lang="en" dir="ltr" class="mw-content-ltr"><table id="toc" class="toc"><tr><td><div id="toctitle"><h2>Contents</h2></div>
+<ul>
+<li class="toclevel-1 tocsection-1"><a href="#Introduction"><span class="tocnumber">1</span> <span class="toctext">Introduction</span></a></li>
+<li class="toclevel-1 tocsection-2"><a href="#Simple_using_of_overlays"><span class="tocnumber">2</span> <span class="toctext">Simple using of overlays</span></a>
+<ul>
+<li class="toclevel-2 tocsection-3"><a href="#First_step_and_commands"><span class="tocnumber">2.1</span> <span class="toctext">First step and commands</span></a></li>
+<li class="toclevel-2 tocsection-4"><a href="#Loop_devices"><span class="tocnumber">2.2</span> <span class="toctext">Loop devices</span></a></li>
+<li class="toclevel-2 tocsection-5"><a href="#Enabling_overlay_devices"><span class="tocnumber">2.3</span> <span class="toctext">Enabling overlay devices</span></a></li>
+<li class="toclevel-2 tocsection-6"><a href="#Stopping_overlay_devices"><span class="tocnumber">2.4</span> <span class="toctext">Stopping overlay devices</span></a></li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-7"><a href="#Situation_analysis"><span class="tocnumber">3</span> <span class="toctext">Situation analysis</span></a></li>
+<li class="toclevel-1 tocsection-8"><a href="#Parameters_recovery"><span class="tocnumber">4</span> <span class="toctext">Parameters recovery</span></a>
+<ul>
+<li class="toclevel-2 tocsection-9"><a href="#Data-offset"><span class="tocnumber">4.1</span> <span class="toctext">Data-offset</span></a></li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-10"><a href="#Example_of_command"><span class="tocnumber">5</span> <span class="toctext">Example of command</span></a>
+<ul>
+<li class="toclevel-2 tocsection-11"><a href="#The_easy_one"><span class="tocnumber">5.1</span> <span class="toctext">The easy one</span></a></li>
+<li class="toclevel-2 tocsection-12"><a href="#A_more_precise_one"><span class="tocnumber">5.2</span> <span class="toctext">A more precise one</span></a></li>
+<li class="toclevel-2 tocsection-13"><a href="#One_facultative_member_is_missing"><span class="tocnumber">5.3</span> <span class="toctext">One facultative member is missing</span></a></li>
+<li class="toclevel-2 tocsection-14"><a href="#The_array_was_created_with_2_disks.2C_and_grown_to_3"><span class="tocnumber">5.4</span> <span class="toctext">The array was created with 2 disks, and grown to 3</span></a></li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-15"><a href="#In_case_of_accidental_rebuild"><span class="tocnumber">6</span> <span class="toctext">In case of accidental rebuild</span></a></li>
+<li class="toclevel-1 tocsection-16"><a href="#Help_needed.2C_no_combination_is_giving_back_access_to_the_data"><span class="tocnumber">7</span> <span class="toctext">Help needed, no combination is giving back access to the data</span></a></li>
+<li class="toclevel-1 tocsection-17"><a href="#Unlucky_situations"><span class="tocnumber">8</span> <span class="toctext">Unlucky situations</span></a>
+<ul>
+<li class="toclevel-2 tocsection-18"><a href="#The_RAID_array_is_split_into_2_arrangements"><span class="tocnumber">8.1</span> <span class="toctext">The RAID array is split into 2 arrangements</span></a></li>
+<li class="toclevel-2 tocsection-19"><a href="#Mandatory_member_lost"><span class="tocnumber">8.2</span> <span class="toctext">Mandatory member lost</span></a></li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-20"><a href="#Making_sure_that_none_of_my_arrays_will_never_be_lost_anymore_in_the_future"><span class="tocnumber">9</span> <span class="toctext">Making sure that none of my arrays will never be lost anymore in the future</span></a></li>
+</ul>
+</td></tr></table>
+<h1> <span class="mw-headline" id="Introduction"> Introduction </span></h1>
+<p>If you feel comfortable using overlays, this is always a good idea for your first attempts (so that no accidental write can happen to the real members until the correct parameter set is proven to be found, and right). You will find some help about discovering and using overlay into this guide.
+</p><p>Every information and situation you can find here has been seriously tested on mdadm 3.4-4 and 4.1-1 before being published.
+</p><p>Going here is normally not needed, unless mdadm conventional ways won't have any chance to work anymore (we believe that you explored others solution before going here). This section is about searching right parameters to play --create over an existing array, in order to retrieve a correctly configured access to any still available data (be it the entire filesystem if still available).
+</p><p>Be warned: playing mdadm --create erases and overwrites at least the RAID array information area of every involved RAID members. A misuse of mdadm --create can be the reason why you are here. Without the --assume-clean parameter, one or several member data area can be entirely reconstructed (sometimes it's fine, sometimes it's not, sometimes it's recoverable, sometimes it's not - so it's better to avoid it). Without the --readonly parameter, mounting and browsing the filesystem can write things, and it can be a problem if some of the members finally aren't at the right position into the array.
+</p><p>If the correct RAID array information is still available (then are you sure nothing else can be done with conventional ways?), to save some time, please keep the output of cat /proc/mdstat (for getting the members orders), and the output of mdadm --examine against your differents RAID members. It should be done BEFORE calling any mdadm --create command. Creation and Update time are provided into the output, so you can easily know if it contains your original array information, or if it's already lost/overwritten.
+</p><p>If you can't manage to be sure about the position of each disk into the array, and you have a large number of disks, you are encouraged to find a way to remember the position of as much disks as possible into the array, and prepare a listing of all possible combinations (starting with the most likely ones) because 4 disk could already give you a lot of work, and above 4 disks, an huge amount of attempts may be needed. Needing you each time to verify if your data is correctly available by checking the integrity of files that are big enough to be spread on every members.
+</p><p>Members can be entire drives or partitions inside of it. If you erased a GPT table describing a partition by mistake, or removed the partition by mistake, please create it again, unformatted, at the same place (and same size) it was when used as RAID member. The content of the partition may be completely or mostly untouched (depending whether it has just been marked deleted, or partially overwritten).
+</p>
+<h1> <span class="mw-headline" id="Simple_using_of_overlays"> Simple using of overlays </span></h1>
+<h2> <span class="mw-headline" id="First_step_and_commands"> First step and commands </span></h2>
+<p>Writing on an overlay associated with a disk or partition won't really write the data to the disk or partition (but to an overlay file instead).
+Reading on an overlay associated with a disk or partition will show the content of the partition, but will include what has been written to the overlay file.
+This clever mechanism will give you some security during your attempts, as --create attempts will overwrite RAID array informations of each member, and if something accidentally attempts to write into the array or members, the real ones are safe.
+</p><p>mdadm should do really few writes, so you can truncate the overlay to a tiny size compared to your RAID members.
+</p><p>If my members are /dev/sdc1, and /dev/sdd1:
+</p>
+<pre>mkdir overlay-files
+cd overlay_files
+truncate -s1G overlay-sdc1
+truncate -s1G overlay-sdd1
+</pre>
+<p>This creates two 1GB sized files&#160;: overlay-sdc1 and overlay-sdd1
+</p>
+<h2> <span class="mw-headline" id="Loop_devices"> Loop devices </span></h2>
+<p>The overlay system will use loop devices. How does loop devices works?
+</p>
+<ul><li>Make some file available as a block device on /dev/loop0 (as read/write)
+</li></ul>
+<pre>losetup /dev/loop0 /address/of/someFile
+</pre>
+<ul><li>Disable the block device
+</li></ul>
+<pre>losetup -d /dev/loop0
+</pre>
+<p>You can use 0, 1, 2, ... and so on. losetup -a will show you currently active loop devices. losetup -f can be used to find an available number.
+</p><p>For our overlay files:
+</p>
+<pre>losetup /dev/loop0 overlay-sdc1
+losetup /dev/loop1 overlay-sdd1
+</pre>
+<h2> <span class="mw-headline" id="Enabling_overlay_devices"> Enabling overlay devices </span></h2>
+<p>I'm not sure to understand everything into those commands. But it works:
+</p>
+<pre>size1=$(blockdev --getsize /dev/sdc1);
+size2=$(blockdev --getsize /dev/sdd1);
+</pre>
+<pre>echo 0 $size1 snapshot /dev/sdc1 /dev/loop0 P 8 | dmsetup create sdc1
+echo 0 $size2 snapshot /dev/sdc1 /dev/loop1 P 8 | dmsetup create sdd1
+</pre>
+<p>According to some software able to list block devices (gnome-disks, photorec), /dev/mapper/sdc1 and /dev/mapper/sdd1 are available, showing the size of my RAID members ($size1 and $size2). It's using the true /dev/sdc1 and /dev/sdd1 for reading, and /dev/loop0 and /dev/loop1 for writing (and reading back) changes.
+</p><p>Some disk usage monitor like bmw-ng ('n' for disks, 't' for displaying sums) shows that playing read and write with the /dev/mapper devices (or RAID array using it) instead of the real ones seems to work, without writing anything to the real devices. If you exceeded the maximum write amount permitted by the size of your overlays files, write operations won't work (Input/output error).
+</p><p>For monitoring your overlay devices, you can use dmsetup status.
+</p>
+<h2> <span class="mw-headline" id="Stopping_overlay_devices"> Stopping overlay devices </span></h2>
+<p>For removing the overlays when you finished or screwed them:
+</p>
+<pre>dmsetup remove sdc1
+dmsetup remove sdd1
+losetup -d /dev/loop0
+losetup -d /dev/loop1
+rm overlay-sdc1
+rm overlay-sdd1
+</pre>
+<h1> <span class="mw-headline" id="Situation_analysis"> Situation analysis </span></h1>
+<p>A RAID array member has 2 area: RAID array information (which may be lost if you are here), and the Data area. As long as the Data area is not erased, you can consider the member as useful for the following steps. If Data area is erased, it should be considered as missing for the following steps (and if the missing member is mandatory, don't quit this page before taking a look at the "Unlucky situations" section: may be some files can be recovered).
+</p><p>You are about to recover entire access to your filesystem as long as:
+</p>
+<ul><li>Your array is redundant and you didn't lose/overwrite any member data area
+</li><li>Your array isn't redundant but hopefully, you didn't lose/overwrite any member data area
+</li><li>Your array is redundant, you have lost/overwritten one member data area, but hopefully there is still enough others members left to get your data back
+</li><li>The data inside your members are arranged in one consistent and predictable way all over the array
+</li></ul>
+<p>If you aren't lucky, don't quit this page before taking a look at the "Unlucky situations" section: there's still several things to verify before aborting.
+</p>
+<h1> <span class="mw-headline" id="Parameters_recovery"> Parameters recovery </span></h1>
+<p>Playing --create over an existing array needs you to know:
+</p>
+<ul><li>The number of members in your array.
+</li><li>The RAID level of your array
+</li><li>The chunk size of your array if using RAID0, RAID4, RAID5, RAID6, or RAID10 (generally 512K on modern mdadm versions, at least for 3.4-4 and 4.1-1)
+</li><li>The metadata version of your array (depends of the mdadm version initially used to create the array - 1.2 on modern versions, at least for 3.4-4 and 4.1-1)
+</li><li>The layout of your array if using RAID5, RAID6, or RAID10 (generally left-symmetric by default for RAID5 and 6, and can be near=2 for RAID10 if your 4 members are A, A, B, B)
+</li><li>The data offset of your array (depends on the size of your array members used at initial array creation - even if members have been replaced by bigger ones after, and grow --size=max used! It also depends on the version of mdadm you were using at the initial creation)
+</li><li>The position of the different members into the array (if it changed on the motherboard since initial creation, you may need to try several ones. If not, you probably used alphabetical order)
+</li><li>Is any of your member missing, or having his Data area overwritten by something like a wrong command? Which one? Because it should be declared as "missing" when running --create. If you don't know which one, you will have to do more attempts.
+</li><li>--assume-clean will give you the ability to make several attempts without having any member rebuilt/overwritten
+</li><li>--readonly will give you the ability to mount the filesystem without causing any update to any byte of the data into the array
+</li></ul>
+<p>If nothing changed on your system (members size, mdadm version...) and you used default parameters, then letting mdadm choosing default ones should be fine and apply the right parameters.
+</p>
+<h2> <span class="mw-headline" id="Data-offset"> Data-offset </span></h2>
+<p>If you changed mdadm version since initial array creation, data-offset is likely to have changed. I have seen 8192s when created with tiny disks (5000 MiB) into mdadm 3.4-4 (while 4.1-1 defaults to 10240s for the same size, and 18432s for 10000 MiB), and 262144s for 8TB drives with mdadm 3.4-4. Didn't try creating with 8TB members on mdadm 4.1-1. May be some formula can be found into the different code versions?
+</p>
+<h1> <span class="mw-headline" id="Example_of_command"> Example of command </span></h1>
+<h2> <span class="mw-headline" id="The_easy_one"> The easy one </span></h2>
+<p>Using Debian 9, mdadm 3.4-4, a RAID array was created with with 3 x 8TB members, using:
+</p>
+<pre>mdadm --create /dev/md0 --level=5 --raid-devices=3 /dev/sdb1 /dev/sdc1 /dev/sdd1
+</pre>
+<p>If nothing changed and I'm still using the same mdadm version, typing the same command again (but appending --assume-clean --readonly for safety) will be fine: 
+</p>
+<pre>mdadm --create /dev/md0 --level=5 --raid-devices=3 /dev/mapper/sdb1 /dev/mapper/sdc1 /dev/mapper/sdd1 --assume-clean --readonly
+</pre>
+<p>Gnome-disks shows the file system again and I can mount it (trying read-only before, mount -o ro,noload /dev/mdXX /media/raid-volume)&#160;: everything is fine and every member is in the right place into the array. Then, do not forget to do a filesystem check and repair after you ensured that you are using the correct parameters, in case some brutal interruption happened previously on the array.
+</p>
+<h2> <span class="mw-headline" id="A_more_precise_one"> A more precise one </span></h2>
+<p>For creating the array again after having upgraded from mdadm 3.4-4 to mdadm 4.1-1, data offset should be specified because the automatically selected value for a given size changed. 
+</p><p>Also, disk position changed on my motherboard. After a precise analysis of the previous version defaults parameters for this array, in this case, the working command for finding back my array finally was:
+</p>
+<pre>mdadm --create /dev/md0 --level=5 --chunk=512K --metadata=1.2 --layout left-symmetric --data-offset=262144s --raid-devices=3 /dev/mapper/sdd1 /dev/mapper/sde1 /dev/mapper/sdb1 --assume-clean --readonly
+</pre>
+<h2> <span class="mw-headline" id="One_facultative_member_is_missing"> One facultative member is missing </span></h2>
+<p>If the second disk is missing, type missing instead of its block device name. On a redundant RAID array, data will still be available. Of course, once your array is back working, you will have to --add the missing member soon or late for safety, but after you ensured that the parameters are OK and your data available. The member you will add will be rebuilt with consistent data. 
+</p>
+<h2> <span class="mw-headline" id="The_array_was_created_with_2_disks.2C_and_grown_to_3"> The array was created with 2 disks, and grown to 3 </span></h2>
+<p>Having the array initially created with 2 disks before having the 3rd one added and the array grown, give the exact same final arrangement compared to a 3 disks array creation.
+</p>
+<h1> <span class="mw-headline" id="In_case_of_accidental_rebuild"> In case of accidental rebuild </span></h1>
+<p>If you forgot the --assume-clean parameter, a rebuild process may have rewritten some of your members.
+But if you were using --readonly, then you are fine (in both case, I didn't see any rebuild process starting).
+</p>
+<ul><li>In case of RAID 0, there is no possible rebuild process. That's fine.
+</li><li>In case of RAID 1, only the 1st member is read, the others ones are overwritten with a copy of it.
+</li><li>In case of RAID 5, the last RAID member given in parameter will be overwritten by reading and processing data of the others given members. If your original array was already using RAID5, and the member count is correct, it's likely to be fine.
+</li><li>In case of RAID 6, every member is rewritten by reading and computing data from others ones. If you are wrong about the position of 2 disks out of 4, you can recover, see below. If its more, it likely to be lost (but I didn't try with array bigger than 4 disks)
+</li><li>In case of RAID 10, with 4 members and default parameters, 1st drive is read and copied to the 2nd one, while 3rd drive is read and copied to the 4th one.
+</li></ul>
+<p>In case of RAID 5:
+</p>
+<ul><li>Even with wrong order or wrong chunk size, and any wrong RAID5 or RAID4-like layout, if the others members data is fine, and the amount of members is correct, the parity calculation will be correct. Although the computer may not interpret the data the right manner (which bit is parity or data) until you find the right parameters. 
+</li><li>But if you forget the --assume-clean parameter in others cases (like incorrect amount of disks, or RAID level, or reading a lost member to calculate and rewrite over a good one), consider the overwritten disk as missing.
+</li></ul>
+<p>In case of RAID6:
+</p>
+<ul><li>Driving some tests about RAID6, having the members accidentally rebuilt with 2 out of 4 disks in the wrong position (1243 - for example - instead of 1234) an erroneous reconstruction is applied on all of the 4 members. Trying to access the array filesystem, the files were incorrect. But --creating the RAID again, with the 4 disks back at the correct position (and --assume-clean and --readonly) restored the access to the correct data. Replaying the same command after ensuring the position are right, and without --assume-clean and --readonly also restored the original data over all of the 4 disks (sha1sum controlled, RAID information excluded).
+</li><li>Driving another test, it seems that if you have accidentally rebuilt your array  with 2 out of 4 disks in the wrong position (still 1243 instead of 1234 for example), mounting the array with only disk 1 and 2 won't be fine. Nothing more with 1, 2, and 3: the 4 disks should be used. This is probably due to the fact that the erroneous reconstruction is done over all of the members, so all of them are needed to revert this error.
+</li></ul>
+<p>In others cases:
+In case correct data seems to be erased from only one of your members, if it wasn't mandatory (if remaining fine members are enough), you will be able to resync it later by --adding it as a new one, but only once your correct parameters are found, and your array back working. If the overwritten member was mandatory, hope you played mdadm --stop. Please find a way to verify if the data is really gone, and if it's gone, go to the "Unlucky situations" section.
+</p>
+<h1> <span class="mw-headline" id="Help_needed.2C_no_combination_is_giving_back_access_to_the_data"> Help needed, no combination is giving back access to the data </span></h1>
+<p>If you have 3 members and you are sure that data is still available on both of them, try every order: 
+</p>
+<ul><li>Disk 1, Disk 2, Disk 3 
+</li><li>Disk 1, Disk 3, Disk 2
+</li><li>Disk 2, Disk 1, Disk 3
+</li><li>Disk 2, Disk 3, Disk 1
+</li><li>Disk 3, Disk 1, Disk 2 
+</li><li>Disk 3, Disk 2, Disk 1
+</li></ul>
+<p>If it's not working, you should find a way to ensure data-offset (and may be others values) are correct, by creating a reconstitution of your original array creation environment to find what default values mdadm probably used. If your values are good, your data are back.
+If one of the members has its data missing, and you know which one (if not, its longer), check every combination:
+</p><p>Member 1/3 is missing: X23, X32, 2X3, 23X, 3X2, 32X
+</p><p>Member 2/3 is missing: 1X3, 13X, X13, X31, 31X, 3X1
+</p><p>Member 3/3 is missing: 12X, 1X2, 21X, 2X1, X12, X21
+</p><p>The numbers stand for the different members block device names, X stands for the "missing" word, in order to represent the parameters order into --create command.
+</p><p>If you have 4 members, there is 24 possible combinations:
+</p>
+<ul><li>1234, 1243, 1324, 1342, 1423, 1432
+</li><li>2134, 2143, 2314, 2341, 2413, 2431
+</li><li>3124, 3142, 3214, 3241, 3412, 3421
+</li><li>4123, 4132, 4213, 4231, 4312, 4321
+</li></ul>
+<p>If you are using RAID6 with 4 members, as 2 disks out of 4 are optional, let's save some time, try the 12 following attempts&#160;:
+</p>
+<ul><li>1st disk in 1st place, 2nd disk in the others places&#160;: 12xx 1x2x 1xx2
+</li><li>1st disk in 2nd place, 2nd disk in the others places&#160;: 21xx x12x x1x2
+</li><li>1st disk in 3rd place, 2nd disk in the others places&#160;: 2x1x x21x xx12
+</li><li>1st disk in 4th place, 2nd disk in the others places&#160;: 2xx1 x2x1 xx21
+</li></ul>
+<p>Still about the RAID6 with 4 disks, if the disk number 2 and disk number 4 have lost their data or aren't available for any reason, you will have to use disk numbers 1 and 3 to do the same position attempts (instead of disk 1 and 2). If you are sure 2 disks are badly overwritten but you don't know which ones, 12, 13, 14, 23, 24, 34 are the possible couples: up to 6 x 12 try may be required to find back your data.
+</p>
+<h1> <span class="mw-headline" id="Unlucky_situations"> Unlucky situations </span></h1>
+<h2> <span class="mw-headline" id="The_RAID_array_is_split_into_2_arrangements"> The RAID array is split into 2 arrangements </span></h2>
+<ul><li>Did the reshape/conversion actually started? If you are sure that the answer is no (stuck at 0% with no disk activity, backup file is there but contains nothing, nothing started and it's completely stuck), then things will be easy. Find the parameters set of the unchanged arrangement.
+</li></ul>
+<ul><li>If the reshape/conversion actually started and moved some data, this kind of interruption can be restarted just by assembling the array again, and mount/use it as nothing happened. If it doesn't work, see if there is no parameters to force things to continue: don't follow this guide unless RAID information of your members have already been erased, or if you're sure that nothing else worked.
+</li></ul>
+<ul><li>If a member failed during reshaping, and your array is redundant, don't play --create! You can add a new member: reshaping will finish in degraded mode, and the last member will be integrated and rebuilt just after.
+</li></ul>
+<ul><li>If you have no other choice that playing --create with 2 different arrangements over 2 half of the array, unless someone have a better idea, you're falling into forensics&#160;: you'll need to find 2 sets of parameters, and probably need to use a file recovery scanner tool to run twice, with both parameters set on the array. The second set of parameters will probably be the same as the first one, with 1 more member (and raid-devices count set to one more). 
+</li></ul>
+<p>In this case, having done some test with 2 sets of parameters and 2 photorec passes, shown that almost every photos are recoverable but names and folders structure was seriously lost. In order to preserve a maximum of future possible attempts, please use overlays for keeping your RAID members information area untouched, in case this approach finally proves to give insufficient results for your case: you may try to know where the separation is between the 2 arrangements and concatenate the resulting data of both arrangements, or anything else to get the original filesystem started again.
+</p><p>Remember that when it is possible, having the array cleanly restarted and finishing the conversion can be much better.
+</p>
+<h2> <span class="mw-headline" id="Mandatory_member_lost"> Mandatory member lost </span></h2>
+<p>So, your RAID is not redundant (or not enough), and a mandatory member (or the data area into it) is screwed.
+</p>
+<ul><li>Is your RAID member partially screwed/overwritten? If mdadm --create (or anything else) started to overwrite it, but you played mdadm --stop before it's entirely overwritten (or stopped anything that was overwriting the data into it), some of the data is still available. Find back your correct parameters (but you won't see any ext4 partition so it will be more difficult to know it you have the right ones) and use some file recovery scanner tool over your resulting array. You may still have the surprise to see some files that aren't completely erased.
+</li></ul>
+<ul><li>Also, remember that having mdadm --create accidentally overwriting disks should be avoided, but if it accidentally happens, in some case, it may be recoverable (see the section about it). If you aren' sure, you can always try to use the member as if it's OK: if it is, your filesystem (or some parts of it) could be made available again.
+</li></ul>
+<ul><li>If one of the disks physically failed, but the data is still enclosed into it, see if RAW data into it can be rescued and cloned by some company, or if available sectors can be rescued by dd-rescue. See <a href="/index.php/Replacing_a_failed_drive" title="Replacing a failed drive">Replacing a failed drive</a> for more detailed information about drive failure, including failure in non-redundant arrays.
+</li></ul>
+<h1> <span class="mw-headline" id="Making_sure_that_none_of_my_arrays_will_never_be_lost_anymore_in_the_future"> Making sure that none of my arrays will never be lost anymore in the future </span></h1>
+<p>You can't, because it won't always be your fault. We believe that having succeeded or not into your recovery, you are probably interested into clever backup approaches for securing the recovered or future data.
+</p><p>Indeed, a defective power supply can destroy some of your disks. A violent shock on the case containing all the disks can cause several of them to fail. A fire incident too. The server can be stolen (with disks inside of it). A ransomware having access to some part of the filesystem, even through the network file sharing, can also destroy all of the writable files. A wrong dd, shred, or you swapped the wrong "failed" disk, opened it to play with what's inside, before realizing it wasn't the failed one. Data memory module malfunction during a rebuild (it can screw the data of one of your members without letting you know what happened). And may be others things.
+</p><p>A free open source versioned continuous copy system like Syncthing (in case files are being encrypted, the previous version is kept and timestamped) isn't officially meant to protect you in this kind of cases, but still does it pretty well. Conventional backups systems and solutions could also be used. In case of malicious attack, still remember to use a backup system that is different enough of the system you are trying to backup (not the same password, not the same config, not the same network, not the same place: it would be like a RAID1 on 2 partitions of the same disk).
+</p>
+<!-- 
+NewPP limit report
+Preprocessor node count: 78/1000000
+Post‐expand include size: 0/2097152 bytes
+Template argument size: 0/2097152 bytes
+Expensive parser function count: 0/100
+-->
+
+<!-- Saved in parser cache with key korg_mediawiki_raid:pcache:idhash:2831-0!*!0!!en!*!* and timestamp 20220109172346 -->
+</div><div class="printfooter">
+Retrieved from "<a href="https://raid.wiki.kernel.org/index.php?title=Irreversible_mdadm_failure_recovery&amp;oldid=6231">https://raid.wiki.kernel.org/index.php?title=Irreversible_mdadm_failure_recovery&amp;oldid=6231</a>"</div>
+		<div id='catlinks' class='catlinks catlinks-allhidden'></div>		<!-- end content -->
+				<div class="visualClear"></div>
+	</div>
+</div></div>
+<div id="column-one">
+	<div id="p-cactions" class="portlet">
+		<h5>Views</h5>
+		<div class="pBody">
+			<ul>
+				<li id="ca-nstab-main" class="selected"><a href="/index.php/Irreversible_mdadm_failure_recovery" primary="1" context="subject" title="View the content page [c]" accesskey="c">Page</a></li>
+				<li id="ca-talk" class="new"><a href="/index.php?title=Talk:Irreversible_mdadm_failure_recovery&amp;action=edit&amp;redlink=1" primary="1" context="talk" title="Discussion about the content page [t]" accesskey="t">Discussion</a></li>
+				<li id="ca-viewsource"><a href="/index.php?title=Irreversible_mdadm_failure_recovery&amp;action=edit" primary="1" title="This page is protected.&#10;You can view its source [e]" accesskey="e">View source</a></li>
+				<li id="ca-history"><a href="/index.php?title=Irreversible_mdadm_failure_recovery&amp;action=history" rel="archives" title="Past revisions of this page [h]" accesskey="h">History</a></li>
+			</ul>
+		</div>
+	</div>
+	<div class="portlet" id="p-personal">
+		<h5>Personal tools</h5>
+		<div class="pBody">
+			<ul>
+				<li id="pt-login"><a href="/index.php?title=Special:UserLogin&amp;returnto=Irreversible+mdadm+failure+recovery" title="You are encouraged to log in; however, it is not mandatory [o]" accesskey="o">Log in / create account</a></li>
+			</ul>
+		</div>
+	</div>
+	<div class="portlet" id="p-logo">
+<a href="/index.php/Linux_Raid" style="background-image: url(/skins/common/images-raid/wiki.png);" title="Visit the main page"></a>
+	</div>
+	<div class="generated-sidebar portlet" id="p-navigation">
+		<h5>Navigation</h5>
+		<div class='pBody'>
+			<ul>
+				<li id="n-mainpage-description"><a href="/index.php/Linux_Raid" title="Visit the main page [z]" accesskey="z">Main page</a></li>
+				<li id="n-recentchanges"><a href="/index.php/Special:RecentChanges" title="A list of recent changes in the wiki [r]" accesskey="r">Recent changes</a></li>
+				<li id="n-randompage"><a href="/index.php/Special:Random" title="Load a random page [x]" accesskey="x">Random page</a></li>
+			</ul>
+		</div>
+	</div>
+	<div id="p-search" class="portlet">
+		<h5><label for="searchInput">Search</label></h5>
+		<div id="searchBody" class="pBody">
+			<form action="/index.php" id="searchform">
+				<input type='hidden' name="title" value="Special:Search"/>
+				<input type="search" name="search" title="Search Linux Raid Wiki [f]" accesskey="f" id="searchInput" />
+				<input type="submit" name="go" value="Go" title="Go to a page with this exact name if exists" id="searchGoButton" class="searchButton" />&#160;
+				<input type="submit" name="fulltext" value="Search" title="Search the pages for this text" id="mw-searchButton" class="searchButton" />
+			</form>
+		</div>
+	</div>
+	<div class="portlet" id="p-tb">
+		<h5>Tools</h5>
+		<div class="pBody">
+			<ul>
+				<li id="t-whatlinkshere"><a href="/index.php/Special:WhatLinksHere/Irreversible_mdadm_failure_recovery" title="A list of all wiki pages that link here [j]" accesskey="j">What links here</a></li>
+				<li id="t-recentchangeslinked"><a href="/index.php/Special:RecentChangesLinked/Irreversible_mdadm_failure_recovery" title="Recent changes in pages linked from this page [k]" accesskey="k">Related changes</a></li>
+				<li id="t-specialpages"><a href="/index.php/Special:SpecialPages" title="A list of all special pages [q]" accesskey="q">Special pages</a></li>
+				<li><a href="/index.php?title=Irreversible_mdadm_failure_recovery&amp;printable=yes" rel="alternate">Printable version</a></li>
+				<li id="t-permalink"><a href="/index.php?title=Irreversible_mdadm_failure_recovery&amp;oldid=6231" title="Permanent link to this revision of the page">Permanent link</a></li>
+			</ul>
+		</div>
+	</div>
+</div><!-- end of the left (by default at least) column -->
+<div class="visualClear"></div>
+<div id="footer">
+	<div id="f-poweredbyico">
+		<a href="//www.mediawiki.org/"><img src="/skins/common/images/poweredby_mediawiki_88x31.png" alt="Powered by MediaWiki" width="88" height="31" /></a>
+	</div>
+	<ul id="f-list">
+		<li id="lastmod"> This page was last modified on 5 May 2019, at 16:23.</li>
+		<li id="privacy"><a href="/index.php/Linux_Raid_Wiki:Privacy_policy" title="Linux Raid Wiki:Privacy policy">Privacy policy</a></li>
+		<li id="about"><a href="/index.php/Linux_Raid_Wiki:About" title="Linux Raid Wiki:About">About Linux Raid Wiki</a></li>
+		<li id="disclaimer"><a href="/index.php/Linux_Raid_Wiki:General_disclaimer" title="Linux Raid Wiki:General disclaimer">Disclaimers</a></li>
+	</ul>
+</div>
+</div>
+<script>if(window.mw){
+mw.loader.load(["mediawiki.user","mediawiki.page.ready"], null, true);
+}</script>
+<!-- Served in 0.126 secs. --></body></html>

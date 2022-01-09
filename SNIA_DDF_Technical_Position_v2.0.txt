@@ -1,0 +1,10822 @@
+512 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+
+Common RAID Disk Data Format 
+Specification 
+ 
+Version 2.0 Revision 19 
+
+This document has been released and approved by the SNIA.  The SNIA believes that the 
+ideas, methodologies and technologies described in this document accurately represent 
+the SNIA goals and are appropriate for widespread distribution.  Suggestion for revision 
+should be directed to http://www.snia.org/feedback/. 
+ 
+
+SNIA Technical Position 
+
+March 27, 2009 
+
+ 
+
+ 
+
+Revision History 
+
+Revision 
+1.2 
+
+Date 
+
+7/28/2006 
+
+Sections 
+ 
+
+Originator: 
+
+Arnold Jones 
+
+1.20.01 
+
+8/16/2006 
+
+Bill Dawkins 
+
+1.20.02 
+
+2/22/2007 
+
+1.20.03 
+
+03/02/2007 
+
+Bill Dawkins 
+
+Ramamurthy 
+Krithivas 
+
+1.20.04 
+
+3/6/2007 
+
+Bill Dawkins 
+
+1.20.05 
+
+5/3/2007 
+
+Various 
+
+Bill Dawkins 
+
+ 
+
+ 
+
+ 
+
+ 
+
+1.20.06 
+
+06/21/2007 
+
+1.20.07 
+
+07/30/2007 
+
+11/21/2007 
+10/8/2008 
+
+1.20.11 
+Version 2.0 
+rev 17 
+
+Version 2.0 
+rev 18 
+
+Version 2.0 
+rev 19 
+
+Various 
+
+4.2.25 
+
+ 
+Various 
+
+Ramamurthy 
+Krithivas 
+Ramamurthy 
+Krithivas 
+Bill Dawkins 
+Bill Dawkins 
+
+11/18/2008 
+
+Various 
+
+Bill Dawkins 
+
+11/21/2008 
+
+Various 
+
+Bill Dawkins 
+
+Suggestion for changes or modifications to this document should be submitted at 
+http://www.snia.org/feedback/.  
+
+Comments 
+Officially published as SNIA 
+Technical Position. 
+Development draft of the 
+next version of the DDF 
+Specification 
+Added content to support 
+large block size drives 
+Added RAID 5 Rotate after 
+N Stripes equations, and 
+RAID 6 PQ ordered 
+equation.  
+Modified content to support 
+large block size drives. 
+Updated draft to include all 
+1.2 errata. Added variable 
+entries to BBM_Log section. 
+Added enhanced definition 
+of VD states to account for 
+MDF RAID. Added path 
+information for SATA drives 
+in PDE structures. 
+First Draft of the MDF RAID 
+Algorithm.  
+Updated 4.2.25 based on 
+TWG review of 06/26/2007. 
+Draft for IP review 
+Draft candidate for 
+Technical Council 
+submission. 
+Updated draft candidate for 
+Technical Council 
+submission. 
+Approved draft submitted to 
+Technical Council 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+2 
+
+ 
+ 
+
+ 
+
+Typographical Conventions 
+
+The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD 
+NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described 
+in RFC2119 [http://www.ietf.org/rfc/rfc2119.txt]. 
+
+Usage 
+
+The SNIA hereby grants permission for individuals to use this document for personal use only, and for 
+corporations and other business entities to use this document for internal use only (including internal 
+copying, distribution, and display) provided that:  
+
+1)  Any text, diagram, chart, table or definition reproduced must be reproduced in its entirety with no 
+
+alteration; and  
+
+2)  Any document, printed or electronic, in which material from this document (or any portion hereof) 
+
+is reproduced must acknowledge the SNIA copyright on that material, and must credit the SNIA 
+for granting permission for its reuse.  
+
+Other than as explicitly provided above, you may not make any commercial use of this document, sell any 
+or this entire document, or distribute this document to third parties. All rights not explicitly granted are 
+expressly reserved to SNIA. 
+
+Permission to use this document for purposes other than those enumerated above may be requested by 
+e-mailing td@snia.org. Please include the identity of the requesting individual and/or company and a brief 
+description of the purpose, nature, and scope of the requested use. 
+
+Copyright © 2005 – 2008,  Storage Networking Industry Association. 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+3 
+
+TABLE OF CONTENTS 
+
+1 
+
+INTRODUCTION ....................................................................................................... 8 
+
+2  OVERVIEW ............................................................................................................... 9 
+
+2.1  Purpose ................................................................................................................. 9 
+2.2  Design Considerations ...................................................................................... 10 
+2.2.1  Location ....................................................................................................... 10 
+2.2.2  Locality ........................................................................................................ 10 
+2.2.3  DDF Structure Size ..................................................................................... 10 
+2.2.4  DDF Structure Contents .............................................................................. 10 
+2.2.5  DDF Structure Redundancy ........................................................................ 11 
+
+3  DEFINITIONS.......................................................................................................... 12 
+
+3.1  RAID Terms ......................................................................................................... 12 
+3.1.1  Virtual Disk (VD) .......................................................................................... 12 
+3.1.2  Basic Virtual Disk (BVD) .............................................................................. 12 
+3.1.3  Secondary Virtual Disk (SVD) ..................................................................... 12 
+3.1.4  Disk Grouping .............................................................................................. 12 
+3.1.5  Foreign configuration ................................................................................... 12 
+3.1.6  Legacy or Pass-through Disk ...................................................................... 12 
+
+4  RAID LEVELS AND RAID LEVEL QUALIFIERS ................................................... 13 
+
+4.1  Primary RAID Level ............................................................................................ 13 
+4.2  RAID Level Qualifier ........................................................................................... 13 
+4.2.1  RAID-0 Simple Striping (PRL=00, RLQ=00) ................................................ 16 
+4.2.2  RAID-1 Simple Mirroring (PRL=01, RLQ=00) .............................................. 18 
+4.2.3  RAID-1 Multi Mirroring (PRL=01, RLQ=01) ................................................. 19 
+4.2.4  RAID-3 Non-Rotating Parity 0 (PRL=03, RLQ=00) ...................................... 20 
+4.2.5  RAID-3 Non-Rotating Parity N (PRL=03, RLQ=01) ..................................... 22 
+4.2.6  RAID-4 Non-Rotating Parity 0 (PRL=04, RLQ=00) ...................................... 24 
+4.2.7  RAID-4 Non-Rotating Parity N (PRL=04, RLQ=01) ..................................... 26 
+4.2.8  RAID-5 Rotating Parity 0 with Data Restart (PRL=05, RLQ=00) ................. 28 
+4.2.9  RAID-5 Rotating Parity N with Data Restart (PRL=05, RLQ=02) ................ 31 
+4.2.10  RAID-5 Rotating Parity N with Data Continuation (PRL=05, RLQ=03) ..... 33 
+4.2.11  RAID-5E Rotating Parity 0 with Data Restart (PRL=15, RLQ=00) ............ 35 
+4.2.12  RAID-5E Rotating Parity N with Data Restart (PRL=15, RLQ=02) ........... 38 
+4.2.13  RAID-5E Rotating Parity N with Data Continuation (PRL=15, RLQ=03) .. 40 
+4.2.14  RAID-5EE Rotating Parity 0 with Data Restart (PRL=25, RLQ=00) ......... 42 
+4.2.15  RAID-5EE Rotating Parity N with Data Restart (PRL=25, RLQ=02) ......... 45 
+4.2.16  RAID-5EE Rotating Parity N with Data Continuation (PRL=25, RLQ=03) 48 
+4.2.17  RAID-5R Rotating Parity 0 after R Stripes with Data Restart (PRL=35, 
+RLQ=00) 50 
+4.2.18  RAID-5R Rotating Parity N after R Stripes with Data Restart (PRL=35, 
+RLQ=02) 53 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+4 
+
+4.2.19  RAID-5R Rotating Parity N after R Stripes with Data Continuation 
+(PRL=35, RLQ=03) ................................................................................................. 55 
+4.2.20  RAID-1E Integrated Adjacent Stripe Mirroring (PRL= 11, RLQ=00) ......... 57 
+4.2.21  RAID-1E Integrated Offset Stripe Mirroring (PRL=11, RLQ=01) .............. 59 
+4.2.22  RAID-6 Rotating Parity 0 with Data Restart (PRL=06, RLQ=01) .............. 61 
+Parity Re-computation on Block Update ....................................................................................... 64 
+Galois Field Operations ................................................................................................................ 64 
+4.2.23  RAID-6 Rotating Parity N with Data Restart (PRL=06, RLQ=02) ............. 68 
+Parity Re-computation on Block Update ....................................................................................... 70 
+Galois Field Operations ................................................................................................................ 70 
+4.2.24  RAID 6 Rotating Parity N with Data Continuation (PRL=06, RLQ=03) ..... 71 
+Parity Re-computation on Block Update ....................................................................................... 73 
+Galois Field Operations ................................................................................................................ 73 
+
+4.2.23.1 
+4.2.23.2 
+
+4.2.24.1 
+4.2.24.2 
+
+4.2.22.1 
+4.2.22.2 
+
+4.2.25  Multi Disk Failure RAID Rotating Parity 0 with Data Restart (PRL=07, 
+RLQ=00) 74 
+4.2.25.1 
+4.2.25.2 
+4.2.25.3 
+
+Galois Field Generation ................................................................................................................ 76 
+Constant Matrix Generation .......................................................................................................... 77 
+Galois Parity Computation ............................................................................................................ 79 
+
+4.2.26  Multi Disk Failure RAID Rotating Party N with Data Restart (PRL=07, 
+RLQ=02) 80 
+4.2.27  Multi Disk Failure RAID Rotating Party N with Data Continuation (PRL=07, 
+RLQ=03) 82 
+
+4.3  Secondary RAID Level ....................................................................................... 84 
+4.3.1  Striped Secondary RAID Level (SRL=00) ................................................... 85 
+4.3.2  Mirrored Secondary RAID Level (SRL=01) ................................................. 87 
+4.3.3  Concatenated Secondary RAID Level (SLR=02) ........................................ 88 
+4.3.4  Spanned Secondary RAID Level (SRL=03) ................................................ 90 
+
+5  DDF STRUCTURE .................................................................................................. 93 
+
+5.1  DDF Structure Overview .................................................................................... 93 
+5.2  Byte Ordering ..................................................................................................... 94 
+5.3  Signatures, Timestamps and CRCs .................................................................. 97 
+5.4  GUIDs .................................................................................................................. 97 
+5.4.1  Controller GUID ........................................................................................... 97 
+5.4.2  Physical Disk GUID ..................................................................................... 98 
+5.4.3  Virtual Disk GUID ........................................................................................ 99 
+5.4.4  DDF Header GUID ...................................................................................... 99 
+5.5  DDF Header ......................................................................................................... 99 
+5.6  Controller Data ................................................................................................. 105 
+5.7  Physical Disk Records ..................................................................................... 106 
+5.7.1  Physical Disk Entries ................................................................................. 107 
+5.8  Virtual Disk Records ........................................................................................ 110 
+5.8.1  Virtual Disk Entries .................................................................................... 111 
+5.9  Configuration Records .................................................................................... 114 
+5.9.1  Virtual Disk Configuration Record ............................................................. 114 
+5.9.2  Vendor Unique Configuration Record ........................................................ 119 
+5.9.3  Spare Assignment Record ......................................................................... 120 
+5.9.3.1  Spare Assignment Entry ................................................................................................................. 121 
+5.9.3.2  Spare Types and Spare Assignment Entry Details ......................................................................... 122 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+5 
+
+123 
+
+5.10  For committable dedicated spares (Spare Type: Bit1 = 0), once the disk joins 
+a VD, it becomes a permanent member of the VD and the Spare Assignment 
+Record on the spare associated with the VD MUST be deleted.Physical Disk Data
+ 
+5.11  Bad Block Management Log ........................................................................... 124 
+5.11.1  Mapped/Marked Block Entry .................................................................. 124 
+5.12  Diagnostic Space ............................................................................................. 125 
+5.13  Vendor Specific Logs ....................................................................................... 125 
+
+ 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+6 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+7 
+
+1  Introduction 
+In today’s IT environments, there are several reasons why system administrators would wish to change 
+the internal RAID solutions they are using. For example, many servers are shipped with a RAID solution 
+implemented on the motherboard (ROMB). ROMB solutions allow RAID formats to be applied to the disks 
+internal to the server. As the server’s data set grows, the administrator often finds s/he needs to move to 
+a larger direct attached storage (DAS) solution with external JBODs. The system administrator would like 
+to move the internal disks and their data to the DAS system’s external JBODs. One method of migration 
+is to backup a RAID group, transfer the disks to the new storage system, reconfigure the disks as a new 
+RAID group behind the new RAID controller, and restore the data from the backup device. This time 
+consuming procedure also carries some risk of data loss. A better method would be to move the disks 
+with data-in-place from one RAID implementation to another. Unfortunately, the different methods for 
+storing configuration information prohibit data-in-place migration between systems from different storage 
+vendors. 
+
+The SNIA Common RAID Disk Data Format Technical Working Group was chartered define a standard 
+data structure describing how data is formatted across the disks in a RAID group. This specification 
+defines the Common RAID Disk Data Format (DDF) structure. The DDF structure allows a basic level of 
+interoperability between different suppliers of RAID technology. The Common RAID DDF structure 
+benefits storage users by enabling data-in-place migration among systems from different vendors. 
+
+Part of the specification defines how data is distributed for many basic RAID levels. This is necessary to 
+precisely document how data is formatted for RAID levels indicated by the DDF structure. The DDF TWG 
+recognizes that the formats described do not represent all methods for implementing the defined RAID 
+levels. The SNIA does not imply that specification formats represent a preferred RAID implementation. 
+Reviewers of this specification are encouraged to suggest alternate RAID level formats for inclusion into 
+future revisions of the specification. 
+
+The DDF data structure also allows RAID groups with vendor unique RAID formats. While vendor unique 
+RAID formats prohibit data-in-place migration between vendors, the Common RAID DDF will be a benefit 
+in these situations. At a minimum, when a RAID group containing a unique format is moved to a different 
+RAID solution that does not support the format, the new system will still be able to read the DDF 
+structure. It can identify the RAID groups containing the unique format and notify the system administrator 
+that these RAID groups contain valid data that is not accessible by the current storage system. Potential 
+data loss is prevented because the new RAID system will not overwrite the data without administrator 
+confirmation.   
+
+The document is divided into the following sections: 
+
+•  Section 2 is the overview; 
+•  Section 3 describes the definitions used in this specification; 
+•  Section 4 describes the RAID levels defined in this specification; 
+•  Section 5 details the DDF structure. 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+8 
+
+2  Overview 
+
+2.1  Purpose 
+
+This document provides requirements for the RAID configuration Disk Data Format (DDF) structure stored 
+on physical disks attached to RAID controllers. Configuration on Disk (COD) and Metadata are also 
+commonly used terms for the same type of data structure. This DDF structure allows storing RAID 
+configuration information on physical disks by different vendor implementations in a common format so 
+the user data on physical disks is accessible independent of the RAID controller being used.  Controllers 
+are not required to store this information in the same format in their internal memory.  
+
+In the terminology of the SNIA Shared Storage Model (http://www.snia.org/tech_activities/ 
+shared_storage_model), the technical scope of the DDF is limited to the interface between a block 
+aggregation implementation and storage devices.  The DDF is stored as data structures on the storage 
+devices (see Figure 1). 
+
+ 
+
+Figure 1: DDF Technical Scope 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+ 
+
+9 
+
+2.2  Design Considerations 
+
+Location, locality, size and contents are major considerations for the DDF structure. Details on the 
+contents and format of the DDF structure can be found in Section 5. 
+
+2.2.1  Location 
+
+The Anchor Header (see Section 5.5) for the DDF structure MUST be stored at the last logical block 
+returned by either the ATA Identify Device or SCSI Read Capacity commands depending on the type of 
+physical disk. 
+
+The DDF structure SHOULD be stored at the end of the physical disk next to the anchor header. Storing 
+the DDF structure at the end of the physical disk allows the possibility of converting a single non-RAID 
+physical disk to a RAID 1 configuration without shifting user data. Similarly, data on a member of a RAID 
+1 configuration with the DDF structure at the end can also be accessed using a non-RAID controller.  
+
+2.2.2  Locality 
+
+Locality is defined as the scope of the DDF structure.  One approach is to store configuration information 
+about all RAID groups attached to a controller on every physical disk connected to the controller. The 
+second approach is to store configuration information of a RAID group (or virtual disk) only on the 
+physical disks belonging to the participating in a RAID group. In other words, does the DDF structure on 
+one RAID group have information about other RAID groups attached to the same controller? This plays a 
+role when a user wants to move a RAID group from one controller to another while keeping the RAID 
+group intact and without causing ghost images on either controller.  If the DDF structure on one RAID 
+group contains no information about the other RAID groups and if an entire RAID group disappears due 
+to power or cabling problems, the user should be notified about the missing RAID group. Configuration 
+information about all RAID groups may be stored on NVRAM on the controller and provide a notification 
+for the user. However, in case of a failed or replacement controller, the information on the RAID groups is 
+not available. 
+
+The middle ground, chosen for the DDF structure, is to store the complete configuration information of a 
+RAID group on each physical disk participating in the RAID group and to store a minimal amount of 
+information about other the RAID groups and physical disks attached to the controller. This allows a 
+controller to provide notification to the user about missing RAID groups or physical disks when the 
+controller does not have complete information about the configuration. 
+
+2.2.3  DDF Structure Size 
+
+A large DDF structure size provides room for expansion in the future and still uses a negligible amount of 
+storage. It is tempting to use a fixed large DDF structure size; however, low end solutions may not have 
+the memory space to process large tables. 
+
+The DDF structure size is not fixed and depends on solution needs. This is done by using flexible 
+structures where size is a function of the number of physical and virtual disks. A fixed space SHOULD be 
+reserved on physical disks for the DDF structure to accommodate the largest DDF structure size for 
+migration of configurations between different types and classes of solutions. Details on DDF structure 
+size can be found in Section 5. 
+
+2.2.4  DDF Structure Contents 
+
+The DDF structure contains information about partitioning, RAID level, and cache parameters for each 
+virtual disk defined. RAID group state, physical disk location information, and controller settings are 
+among other information included in the DDF structure. The DDF structure contents are defined in detail 
+in Section 5. 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+10 
+
+2.2.5  DDF Structure Redundancy 
+
+DDF structure redundancy allows recovery after configuration structure corruption or loss. Support for 
+redundancy increases solution complexity and is considered OPTIONAL. 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+11 
+
+3  Definitions 
+Whenever possible, this specification uses the definitions for storage terminology provided by SNIA’s “A 
+Dictionary of Storage Networking Terminology.” The dictionary can be found at 
+http://www.snia.org/education/dictionary. This section defines terms that do not have entries in the SNIA 
+dictionary. It also defines terms that use definitions that differ from the definition listed in the SNIA 
+dictionary. 
+
+3.1  RAID Terms 
+
+3.1.1  Virtual Disk (VD) 
+
+A virtual disk is the object presented to the host level for user data storage. At least one physical disk is 
+associated with a VD. 
+
+3.1.2  Basic Virtual Disk (BVD) 
+
+A basic virtual disk is a VD configured using only non-hybrid RAID levels like RAID-0, RAID5 or RAID5E. 
+Its elements are physical disks. 
+
+3.1.3  Secondary Virtual Disk (SVD) 
+
+A secondary virtual disk is a VD configured using hybrid RAID levels like RAID10 or RAID50. Its elements 
+are BVDs. 
+
+3.1.4  Disk Grouping 
+
+A number of physical disks can be combined into a disk group. The primary characteristic of a disk group 
+is that all VDs created on the physical disks cannot extend to other physical disks that are not part of the 
+group. Disk Grouping, when enforced, ensures that the contiguous address space of a VD does not 
+extend beyond a disk group. 
+
+3.1.5  Foreign configuration 
+
+A configuration moved from one controller to another controller is considered a foreign configuration on 
+the new controller unless new controller imports the configuration. Whenever a foreign configuration is 
+detected by a controller, the Foreign_Flag MAY be set in the DDF header on the physical disks in the 
+foreign configuration. Details of the Foreign_Flag are found in Section 5.5. 
+
+3.1.6  Legacy or Pass-through Disk 
+
+Legacy (pass-through) physical disks are attached to a RAID controller and operate as if they were 
+attached to a non-RAID controller. No DDF structure is stored on these physical disks. This feature is 
+primarily targeted for users moving physical disks containing data from non-RAID controllers to RAID 
+controllers. 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+12 
+
+4  RAID Levels and RAID Level Qualifiers 
+This section lists the RAID types and qualifiers for use in following fields used in the Configuration Record 
+(Section 5.9): 
+
+•  Primary RAID Level 
+
+•  RAID Level Qualifier 
+
+•  Secondary RAID Level 
+
+ 
+
+ 
+
+4.1  Primary RAID Level 
+
+Table 1 lists values used in the Primary_RAID_Level field of the Virtual Disk Configuration Record 
+(Section 5.9.1) and the definitions of these values. The Primary_RAID_Level field MUST use the values 
+listed in Table 1. The table defines the standard RAID levels, such as RAID 0, 1, 3, 5, etc. and some 
+proprietary RAID types. Non-RAID types such as JBOD and concatenation are also included for 
+completeness.  
+
+Table 1: Primary RAID Levels 
+
+Name 
+
+Description 
+
+PRL 
+Byte 
+0x00 
+0x01 
+0x03 
+
+0x04 
+
+0x05 
+
+0x06 
+
+0x07 
+
+0x11 
+
+0x0F 
+0x1F 
+0x15 
+0x25 
+0x35 
+
+RAID-0 
+RAID-1 
+RAID-3 
+
+RAID-4 
+
+RAID-5 
+
+RAID-6 
+
+MDF RAID 
+
+RAID-1E 
+
+Single Disk 
+Concatenation 
+RAID-5E 
+RAID-5EE 
+RAID-5R 
+ 
+
+Striped array with no parity 
+Mirrored array 
+Striped array with non-rotating parity, optimized for long, single-
+threaded transfers 
+Striped array with non-rotating parity, optimized for short, multi-
+threaded transfers 
+Striped array with rotating parity, optimized for short, multi-threaded 
+transfers 
+Similar to RAID-5, but with dual rotating parity physical disks, tolerating 
+two physical disk failures 
+Multi disk Failure RAID. Similar to RAID-6, but supporting more than 
+two physical disk failures 
+>2 disk RAID-1, similar to RAID-10 but with striping integrated into 
+array 
+Single, non-arrayed disk 
+Physical disks combined head to tail 
+RAID-5 with hot space at end each extent  
+RAID-5 with hot space integrated into each extent 
+RAID-5 with parity rotated after a configured number of stripes 
+
+4.2  RAID Level Qualifier 
+
+This section defines RAID Level Qualifiers (RLQ) for each Primary RAID Level as defined earlier. The 
+RLQ field MUST be ignored for JBOD and Concatenations (PRL=0F and 1F). Table 2 gives brief 
+descriptions of the RLQs defined for each Primary RAID Level described in this specification. The 
+following subsections describe the data formats defined by the PRLs and the associated RLQs in detail.  
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+13 
+
+ 
+
+Table 2: RAID Level Qualifiers 
+
+Name 
+
+RAID-0 
+RAID-1 Simple Mirroring 
+RAID-1 Multi Mirroring 
+RAID-3 Non-Rotating 
+Parity 0 
+RAID-3 Non-Rotating 
+Parity N 
+RAID-4 Non-Rotating 
+Parity 0 
+RAID-4 Non-Rotating 
+Parity N 
+RAID-5 Rotating Parity 0 
+with Data Restart 
+
+PRL 
+Byte 
+0x00 
+0x01 
+0x01 
+0x03 
+
+Description 
+
+RLQ 
+Byte 
+0x00  No RLQs for this PRL. 
+0x00  Mirroring across two extents. 
+0x01 
+0x00 
+
+Triple mirroring across three extents. 
+Striped array with parity stored on the first extent. 
+
+0x03 
+
+0x01 
+
+Striped array with parity stored on the last extent. 
+
+0x04 
+
+0x00 
+
+Striped array with parity stored on the first extent. 
+
+0x04 
+
+0x01 
+
+Striped array with parity stored on the last extent. 
+
+0x05 
+
+0x00 
+
+RAID-5 Rotating Parity N 
+with Data Restart 
+
+0x05 
+
+0x02 
+
+RAID-5 Rotating Parity N 
+with Data Continuation 
+
+0x05 
+
+0x03 
+
+Striped array with rotating parity striped diagonally 
+from left to right. The first data strip of each stripe 
+starts on the first extent not occupied by parity. 
+Striped array with rotating parity striped diagonally 
+from right to left. The first data strip of each stripe 
+starts on the first extent not occupied by parity. 
+Striped array with rotating parity striped diagonally 
+from right to left. The first data strip of each stripe 
+starts directly below the parity strip of the previous 
+stripe. 
+
+RAID-6 Rotating Parity 0 
+with Data Restart 
+
+RAID-6 Rotating Parity N 
+with Data Restart 
+
+RAID-6 Rotating Parity N 
+with Data Continuation 
+
+0x06 
+
+0x06 
+
+0x06 
+
+0x00  Dual rotating parity striped diagonally from left to 
+
+right. The first data strip of each stripe starts on the 
+first extent not occupied by parity. 
+
+0x02  Dual rotating parity striped diagonally from right to 
+left. The first data strip of each stripe starts on the 
+first extent not occupied by parity. 
+
+0x03  Dual rotating parity striped diagonally from right to 
+left. The first data strip of each stripe starts directly 
+below the second parity strip of the previous stripe. 
+
+MDF RAID Rotating Parity 
+0 with Data Restart 
+
+MDF RAID Rotating Parity 
+N with Data Restart 
+
+MDF RAID Rotating Parity 
+N with Data Continuation 
+
+0x07 
+
+0x00  Multi Disk Failure RAID. Multiple rotating parity 
+
+striped diagonally from left to right. The first data strip 
+of each stripe starts on the first extent not occupied 
+by parity.  
+
+0x07 
+
+0x02  Multi Disk Failure RAID. Multiple rotating parity 
+
+striped diagonally from right to left. The first data strip 
+of each stripe starts on the fist extent not occupied 
+by parity.  
+
+0x07 
+
+0x03  Multi Disk Failure RAID. Multiple rotating parity 
+
+RAID-1E Integrated 
+Adjacent Stripe Mirroring 
+
+0x11 
+
+0x00 
+
+RAID-1E Integrated Offset 
+Stripe Mirroring 
+
+0x11 
+
+0x01 
+
+striped diagonally from right to left. The first data strip 
+of each stripe starts on directly below the last parity 
+of the previous strip. 
+Each data strip is mirrored on the next extent. For 
+arrays with an odd number of extents, one strip of 
+each stripe is mirrored on the next or previous stripe. 
+Each data strip is mirrored on the next stripe of the 
+next extent. 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+14 
+
+Single Disk 
+Concatenation 
+RAID-5E Rotating Parity 0 
+with Data Restart 
+RAID-5E Rotating Parity N 
+with Data Restart 
+RAID-5E Rotating Parity N 
+with Data Continuation 
+RAID-5EE Rotating Parity 
+0 with Data Restart 
+
+0x15 
+
+0x02 
+
+0x15 
+
+0x03 
+
+0x25 
+
+0x00 
+
+RAID-5EE Rotating Parity 
+N with Data Restart 
+
+0x25 
+
+0x02 
+
+RAID-5EE Rotating Parity 
+N with Data Continuation 
+
+0x25 
+
+0x03 
+
+0x35 
+
+0x00 
+
+RAID-5 Rotating Parity 0 
+after R Stripes with Data 
+Restart 
+RAID-5 Rotating Parity N 
+after R Stripes with Data 
+Restart 
+RAID-5 Rotating Parity N 
+after R Stripes with Data 
+Continuation 
+
+ 
+
+0x0F 
+0x1F 
+0x15 
+
+0x00  No RLQs for this PRL. 
+0x00  No RLQs for this PRL. 
+0x00 
+
+Same as PRL=05, RLQ=00 with hot space at the end 
+of each extent. 
+Same as PRL=05, RLQ=02 with hot space at the end 
+of each extent. 
+Same as PRL=05, RLQ=03 with hot space at the end 
+of each extent. 
+Same as PRL=05, RLQ=00 with hot space integrated 
+in to each extent. The hot space of each stripe 
+directly follows the parity block of that stripe. 
+Same as PRL=05, RLQ=02 with hot space integrated 
+in to each extent. The hot space of each stripe 
+directly precedes the parity block of that stripe. 
+Same as PRL=05, RLQ=03 with hot space integrated 
+in to each extent. The hot space of each stripe 
+directly precedes the parity block of that stripe. 
+Same as PRL=05, RLQ=00 with parity rotated after 
+R stripes instead of every stripe. 
+
+0x35 
+
+0x02 
+
+Same as PRL=05, RLQ=02 with parity rotated after 
+R stripes instead of every stripe. 
+
+0x35 
+
+0x03 
+
+Same as PRL=05, RLQ=03 with parity rotated after 
+R stripes instead of every stripe. 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+15 
+
+4.2.1  RAID-0 Simple Striping (PRL=00, RLQ=00) 
+
+Figure 2 shows an example of simple striping (RAID-0).  
+
+Virtual Disk
+
+ Data Block 0
+
+ Data Block 1
+ Data Block 2
+ Data Block 3
+ Data Block 4
+
+ Data Block 5
+ Data Block 6
+
+ Data Block 7
+ Data Block 8
+
+ Data Block 9
+
+ Data Block 10
+ Data Block 11
+ Data Block 12
+ Data Block 13
+
+ Data Block 14
+ Data Block 15
+
+n
+o
+i
+t
+c
+n
+u
+F
+ 
+g
+n
+p
+p
+a
+M
+
+i
+
+Strip (2,0)
+ Data Block 8
+ Data Block 9
+
+ Data Block 10
+ Data Block 11
+
+Strip (2,1)
+ Data Block 28
+ Data Block 29
+
+ Data Block 30
+ Data Block 31
+
+Strip (2,2)
+ Data Block 48
+ Data Block 49
+ Data Block 50
+
+ Data Block 51
+
+Extent Stripe Length
+
+Stripe 0
+
+Depth
+
+Stripe 1
+
+Depth
+
+Stripe 2
+
+Depth
+
+Extent 0
+
+Strip (0,0)
+ Data Block 0
+ Data Block 1
+
+ Data Block 2
+ Data Block 3
+
+Strip (0,1)
+ Data Block 20
+ Data Block 21
+ Data Block 22
+ Data Block 23
+
+Strip (0,2)
+ Data Block 40
+
+ Data Block 41
+ Data Block 42
+ Data Block 43
+
+Extent 1
+
+Strip (1,0)
+ Data Block 4
+ Data Block 5
+ Data Block 6
+
+ Data Block 7
+
+Strip (1,1)
+ Data Block 24
+ Data Block 25
+ Data Block 26
+ Data Block 27
+
+Strip (1,2)
+ Data Block 44
+
+ Data Block 45
+
+ Data Block 46
+ Data Block 47
+
+Extent 2
+
+Extent 3
+
+Extent 4
+
+Strip (3,0)
+ Data Block 12
+ Data Block 13
+
+ Data Block 14
+ Data Block 15
+
+Strip (3,1)
+ Data Block 32
+ Data Block 33
+
+ Data Block 34
+ Data Block 35
+
+Strip (3,2)
+ Data Block 52
+ Data Block 53
+ Data Block 54
+
+ Data Block 55
+
+Strip (4,0)
+ Data Block 16
+ Data Block 17
+
+ Data Block 18
+ Data Block 19
+
+Strip (4,1)
+ Data Block 36
+ Data Block 37
+
+ Data Block 38
+ Data Block 39
+
+Strip (4,2)
+ Data Block 56
+ Data Block 57
+ Data Block 58
+
+ Data Block 59
+
+ 
+
+Figure 2: Simple Striping (PRL=00, RLQ=00) Example 
+
+The standard SNIA dictionary definitions for stripe, strip, stripe depth, and extent are used by this 
+example and following examples. For a Basic Virtual Disk (BVD), as defined by this specification, an 
+extent MUST be a contiguous area of a physical disk. A BVD’s extents MUST be of equal size but are not 
+required to reside in the same location of each physical disk.  
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+16 
+
+The example introduces the concept of extent and stripe indices for a strip. strip (i, j) represents the strip 
+located on extent i in stripe j. The data block index k represents the offset of a given data block from the 
+beginning of a strip. To represent a specific block in a specific extent the following notation is used: 
+
+To refer to a specific block in a virtual disk, the following notation is used: 
+
+extent_block (k, i, j). 
+
+virtual_block (x), 
+
+where x is the offset from the beginning of the VD.  
+
+Table 3 summarizes the indices and constants used in the notation along with the any restrictions on 
+legal values.  
+
+Table 3: Indices and Constants for Simple Striping 
+
+Variable or Index 
+
+Description 
+
+Minimum Value 
+
+Maximum Value 
+
+i 
+
+j 
+
+k 
+
+L 
+M 
+
+N 
+
+x 
+
+Index of an extent of a 
+VD 
+Index of a stripe in a VD 
+
+Offset of a data block 
+from the beginning of a 
+strip 
+Size of a strip in blocks 
+Number of blocks in a 
+VD. M MUST be evenly 
+divisible by N. 
+Number of extents in a 
+VD 
+Offset of a data block 
+from the beginning of a 
+VD 
+
+0 
+
+0 
+
+0 
+
+0 
+
+N-1 
+
+FLOOR(FLOOR((M-
+1)/L)/N) 
+L-1 
+
+N/A (a fixed value) 
+N/A (a fixed value) 
+
+N/A (a fixed value) 
+N/A (a fixed value) 
+
+N/A (a fixed value) 
+
+N/A (a fixed value) 
+
+M-1 
+
+ 
+
+For RAID-0 (PRL=00, RLQ=00), the first strip of the virtual disk MUST be strip (0,0). The allocation of 
+data MUST adhere to the following formula: 
+
+virtual_block (x) = extent_block (MOD(x,L), MOD(FLOOR(x/L), N), FLOOR(FLOOR(x/L)/N)). 
+
+Eq. 1 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+17 
+
+4.2.2  RAID-1 Simple Mirroring (PRL=01, RLQ=00) 
+
+A VD with PRL=01 and RLQ=00 MUST have two and only two extents. Each extent MUST be equal to 
+the size of the VD. Each block of the VD, virtual_block(x), MUST be duplicated on both extents at the 
+same offset 
+
+Figure 3 gives an example of simple mirroring. 
+
+Figure 3: Simple Mirroring (PRL=01, RLQ=00) Example 
+
+  
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+18 
+
+ 
+
+4.2.3  RAID-1 Multi Mirroring (PRL=01, RLQ=01) 
+
+Multi Mirroring (PRL=01, RLQ=01) is a triple mirror. Data MUST be triple copied on three extents. Each 
+virtual_block(x) MUST be duplicated on each extent in the VD. Figure 4 gives an example of multi 
+mirroring. 
+
+Figure 4: Multi Mirroring (PRL=01, RLQ=01) Example 
+
+ 
+
+ 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+19 
+
+4.2.4  RAID-3 Non-Rotating Parity 0 (PRL=03, RLQ=00) 
+
+Figure 5 gives an example of RAID-3 with parity contained on the first extent or Non-Rotating Parity 0. 
+Table 4 defines the indices and constants used in the description of RAID-3. 
+
+Figure 5: RAID-3 Non-Rotating Parity 0 (PRL=03, RLQ=00) Example 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+ 
+
+20 
+
+Table 4: Indices and Constants for RAID-3 Non-Rotating Parity 
+
+Variable or Index 
+
+Description 
+
+Minimum Value 
+
+Maximum Value 
+
+i 
+
+j 
+p 
+
+M 
+
+N 
+
+x 
+
+Index of an extent of a 
+VD 
+Index of a stripe in a VD 
+Index of a data block 
+portion 
+Number of data blocks 
+in a VD 
+Number of extents in a 
+VD 
+Offset of a data block 
+from the beginning of a 
+VD 
+
+0 
+
+0 
+0 
+
+0 
+
+N/A (a fixed value) 
+
+N/A (a fixed value) 
+
+N/A (a fixed value) 
+
+N/A (a fixed value) 
+
+N-1 
+
+M-1 
+N-1 
+
+M-1 
+
+In a RAID-3 VD with N extents, a virtual data block MUST be segmented into N-1 block portions. The 
+notation for data block portions is: 
+
+The allocation of data blocks in a RAID-3 Non-Rotating Parity 0 VD MUST adhere to the following 
+formula: 
+
+block_portion (p, i, j) 
+
+virtual_block(x) = 
+
+block_portion(p, p+1, x), 
+
+where || represents the concatenation operator. 
+
+Parity blocks MUST reside on extent 0. The values of the parity blocks must adhere to the following 
+formula: 
+
+Eq. 2 
+
+2
+
+N
+−
+||
+p
+0
+=
+
+Eq. 3 
+
+N
+
+−
+
+2
+
+p
+
+=
+
+0
+
+parity_block (0, 0, x) = ⊕
+
+ block_portion(p, p+1, x). 
+
+The operator ⊕ refers to bit-wise XOR of the operands. 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+21 
+
+4.2.5  RAID-3 Non-Rotating Parity N (PRL=03, RLQ=01) 
+
+Figure 6 gives an example of a RAID-3 Non-Rotating Parity N VD. The indices and constants defined in 
+Table 4 are valid for this type of VD. 
+
+Figure 6: RAID-3 Non-Rotating Parity N (PRL=03, RLQ=01) Example 
+
+The allocation of data blocks in a RAID-3 Non-Rotating Parity N VD MUST adhere to the following 
+formula: 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+ 
+
+22 
+
+virtual_block(x) = 
+
+block_portion(p, p, x). 
+
+Parity Blocks MUST reside on extent N. The allocation of parity blocks MUST adhere to the following 
+formula: 
+
+parity_block (0, N, x) = ⊕
+
+ block_portion(p, p, x). 
+
+ 
+
+Eq. 4 
+
+2
+
+N
+−
+||
+p
+0
+=
+
+Eq. 5 
+
+N
+
+−
+
+2
+
+p
+
+=
+
+0
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+23 
+
+4.2.6  RAID-4 Non-Rotating Parity 0 (PRL=04, RLQ=00) 
+
+Figure 7 gives an example of RAID-4 Non-Rotating Parity 0. Table 5 defines the indices and constants 
+used in the description of RAID-4. 
+
+Virtual Disk
+
+ Data Block 0
+
+ Data Block 1
+
+ Data Block 2
+
+ Data Block 3
+ Data Block 4
+
+ Data Block 5
+
+ Data Block 6
+ Data Block 7
+
+ Data Block 8
+
+ Data Block 9
+
+ Data Block 10
+
+ Data Block 11
+ Data Block 12
+
+ Data Block 13
+
+ Data Block 14
+
+ Data Block 15
+
+n
+o
+i
+t
+c
+n
+u
+F
+ 
+g
+n
+p
+p
+a
+M
+
+i
+
+Extent 2
+
+Strip (2,0)
+ Data Block 4
+
+ Data Block 5
+ Data Block 6
+
+ Data Block 7
+
+Strip (2,1)
+ Data Block 20
+ Data Block 21
+
+ Data Block 22
+
+ Data Block 23
+
+Strip (2,2)
+ Data Block 36
+
+ Data Block 37
+
+ Data Block 38
+ Data Block 39
+
+Extent Stripe Length
+
+Stripe 0
+
+Depth
+
+Stripe 1
+
+Depth
+
+Stripe 2
+
+Depth
+
+Extent 0
+
+Strip (0,0)
+Parity (0,0,0)
+Parity (1,0,0)
+
+Parity (2,0,0)
+Parity (3,0,0)
+
+Strip (0,1)
+Parity (0,0,1)
+
+Parity (1,0,1)
+Parity (2,0,1)
+Parity (3,0,1)
+
+Strip (0,2)
+Parity (0,0,2)
+
+Parity (1,0,2)
+Parity (2,0,2)
+
+Parity (3,0,2)
+
+Extent 1
+
+Strip (1,0)
+ Data Block 0
+
+ Data Block 1
+
+ Data Block 2
+ Data Block 3
+
+Strip (1,1)
+ Data Block 16
+
+ Data Block 17
+
+ Data Block 18
+ Data Block 19
+
+Strip (1,2)
+ Data Block 32
+ Data Block 33
+
+ Data Block 34
+ Data Block 35
+
+Extent 3
+
+Extent 4
+
+Strip (3,0)
+ Data Block 8
+ Data Block 9
+
+ Data Block 10
+ Data Block 11
+
+Strip (3,1)
+ Data Block 24
+ Data Block 25
+ Data Block 26
+
+ Data Block 27
+
+Strip (3,2)
+ Data Block 40
+
+ Data Block 41
+ Data Block 42
+ Data Block 43
+
+Strip (4,0)
+ Data Block 12
+ Data Block 13
+
+ Data Block 14
+ Data Block 15
+
+Strip (4,1)
+ Data Block 28
+ Data Block 29
+ Data Block 30
+
+ Data Block 31
+
+Strip (4,2)
+ Data Block 44
+
+ Data Block 45
+ Data Block 46
+ Data Block 47
+
+ 
+
+Figure 7: Non-Rotating Parity 0 (PRL=04, PRL=00) Example 
+
+ 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+24 
+
+Table 5: Indices and Constants for RAID 4 Non-Rotating Parity 
+
+Variable or Index 
+
+Description 
+
+Minimum Value 
+
+Maximum Value 
+
+i 
+
+j 
+
+k 
+
+L 
+M 
+
+N 
+
+x 
+
+Index of an extent of a 
+VD 
+Index of a stripe in a VD 
+
+Offset of a block from 
+the beginning of a strip 
+Size of a strip in blocks 
+Number of data blocks 
+in a VD. M MUST be 
+evenly divisible by N-1. 
+Number of extents in a 
+VD 
+Offset of a data block 
+from the beginning of a 
+VD 
+
+N-1 
+
+FLOOR(FLOOR((M-
+1)/L)/N-1) 
+L-1 
+
+N/A (a fixed value) 
+N/A (a fixed value) 
+
+N/A (a fixed value) 
+N/A (a fixed value) 
+
+N/A (a fixed value) 
+
+N/A (a fixed value) 
+
+M-1 
+
+0 
+
+0 
+
+0 
+
+0 
+
+The allocation of data blocks in a Non-Rotating Parity 0 VD MUST adhere to the following equation: 
+
+virtual_block (x) = extent_block (MOD(x,L), MOD(FLOOR(x/L), N-1) +1, FLOOR(FLOOR(x/L)/N-1)). 
+
+A parity block contains the parity calculated for N-1 data blocks. The following notation is used to 
+represent a parity block:  
+
+The values of the parity blocks MUST be calculated according to the following formula: 
+
+parity_block (k, i, j). 
+
+parity_block (k, 0, j) = ⊕
+
+ extent_block(k, i, j). 
+
+For Non-Rotating Parity 0, all parity blocks MUST reside on extent 0. Thus, i MUST equal zero for all 
+parity blocks. 
+
+Eq. 6 
+
+Eq. 7 
+
+N
+
+1
+−
+
+i
+
+1
+=
+
+ 
+
+ 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+25 
+
+4.2.7  RAID-4 Non-Rotating Parity N (PRL=04, RLQ=01) 
+
+Figure 8 gives an example on Non-Rotating Parity N (a.k.a. RAID-4). Non-Rotating Parity N differs from 
+Non-Rotating Parity 0 in that the parity is stored in the last extent of a VD. The indices and constants of 
+Table 5 are valid for Non-Rotating Parity N. 
+
+Virtual Disk
+
+ Data Block 0
+
+ Data Block 1
+ Data Block 2
+
+ Data Block 3
+ Data Block 4
+
+ Data Block 5
+
+ Data Block 6
+ Data Block 7
+
+ Data Block 8
+ Data Block 9
+
+ Data Block 10
+ Data Block 11
+
+ Data Block 12
+ Data Block 13
+ Data Block 14
+ Data Block 15
+
+n
+o
+i
+t
+c
+n
+u
+F
+ 
+g
+n
+p
+p
+a
+M
+
+i
+
+Strip (2,0)
+
+ Data Block 8
+ Data Block 9
+ Data Block 10
+ Data Block 11
+
+Strip (2,1)
+
+ Data Block 24
+
+ Data Block 25
+ Data Block 26
+
+ Data Block 27
+
+Strip (2,2)
+
+ Data Block 40
+ Data Block 41
+
+ Data Block 42
+ Data Block 43
+
+Stripe 0
+
+Depth
+
+Stripe 1
+
+Depth
+
+Stripe 2
+
+Depth
+
+Extent 0
+
+Strip (0,0)
+ Data Block 0
+ Data Block 1
+ Data Block 2
+ Data Block 3
+
+Strip (0,1)
+ Data Block 16
+
+ Data Block 17
+ Data Block 18
+ Data Block 19
+
+Strip (0,2)
+ Data Block 32
+ Data Block 33
+
+ Data Block 34
+ Data Block 35
+
+Extent 1
+
+Strip (1,0)
+ Data Block 4
+ Data Block 5
+
+ Data Block 6
+ Data Block 7
+
+Strip (1,1)
+ Data Block 20
+ Data Block 21
+ Data Block 22
+ Data Block 23
+
+Strip (1,2)
+ Data Block 36
+ Data Block 37
+ Data Block 38
+
+ Data Block 39
+
+Extent 2
+
+Extent 3
+
+Extent Stripe Length
+
+Strip (3,0)
+
+ Data Block 12
+ Data Block 13
+ Data Block 14
+ Data Block 15
+
+Strip (3,1)
+
+ Data Block 28
+
+ Data Block 29
+ Data Block 30
+
+ Data Block 31
+
+Strip (3,2)
+
+ Data Block 44
+ Data Block 45
+
+ Data Block 46
+ Data Block 47
+
+Extent 4
+
+Strip (4,0)
+
+Parity (0,4,0)
+Parity (1,4,0)
+Parity (2,4,0)
+Parity (3,4,0)
+
+Strip (4,1)
+
+Parity (0,4,1)
+Parity (1,4,1)
+Parity (2,4,1)
+Parity (3,4,1)
+
+Strip (4,2)
+Parity (0,4,2)
+Parity (1,4,2)
+
+Parity (2,4,2)
+Parity (3,4,2)
+
+ 
+
+Figure 8: Non-Rotating Parity N (PRL=04, RLQ=01) Example 
+
+The allocation of data blocks in a Non-Rotating Parity N VD MUST adhere to the following formula: 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+26 
+
+virtual_block (x) = extent_block (MOD(x,L), MOD(FLOOR(x/L), N-1), FLOOR(FLOOR(x/L)/N-1)). 
+
+The values of the parity blocks MUST be calculated according to the following formula: 
+
+parity_block (k, N-1, j) = ⊕
+
+ extent_block(k, i, j). 
+
+All parity blocks MUST reside on extent N-1. Thus, i MUST equal N-1 for all parity blocks. 
+
+Eq. 8 
+
+Eq. 9 
+
+N
+
+−
+
+2
+
+i
+
+=
+
+0
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+27 
+
+4.2.8  RAID-5 Rotating Parity 0 with Data Restart (PRL=05, RLQ=00) 
+
+Figure 9 gives an example of Rotating Parity 0 with Data Restart. Rotating Parity 0 with Data Restart is an 
+implementation of RAID-5. Table 6 defines the indices and constants used in the description of RAID-5. 
+
+n
+o
+i
+t
+c
+n
+u
+F
+ 
+g
+n
+p
+p
+a
+M
+
+i
+
+Figure 9:  Rotating Parity 0 with Data Restart (PRL=05, RLQ=00) Example 
+
+ 
+
+ 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+28 
+
+Table 6:  Indices and Constants for RAID-5 Rotating Parity 0 and N 
+
+Variable or Index 
+
+Description 
+
+Minimum Value 
+
+Maximum Value 
+
+i 
+
+j 
+
+k 
+
+L 
+M 
+
+N 
+
+x 
+
+p 
+
+Index of an extent of a 
+VD 
+Index of a stripe in a VD 
+
+Offset of a block from 
+the beginning of a strip 
+Size of a strip in blocks 
+Number of data blocks 
+in a VD. M MUST be 
+evenly divisible by (N-
+1)*L 
+Number of extents in a 
+VD 
+Offset of a data block 
+from the beginning of a 
+VD 
+Index of the extent on 
+which the parity_blocks 
+for a given stripe reside 
+
+N-1 
+
+FLOOR(FLOOR((M-
+1)/L)/(N-1)) 
+L-1 
+
+N/A (a fixed value) 
+N/A (a fixed value) 
+
+N/A (a fixed value) 
+N/A (a fixed value) 
+
+N/A (a fixed value) 
+
+N/A (a fixed value) 
+
+0 
+
+0 
+
+0 
+
+0 
+
+0 
+
+M-1 
+
+N-1 
+
+ 
+
+The extent p on which the parity block for a given virtual block x resides MUST adhere to the following 
+formula: 
+
+The extent i on which a given virtual block x  resides MUST adhere to the following formula: 
+
+p = MOD(FLOOR(FLOOR(x/L)/(N-1)),N). 
+
+ 
+
+ 
+
+ 
+
+IF  MOD(FLOOR(x/L),N-1) < p  
+
+THEN  i =  MOD(FLOOR(x/L),N-1)  
+
+ELSE  i = MOD(FLOOR(x/L),N-1)+1. 
+
+The allocation of data blocks in a Rotating Parity 0 with Data Restart VD MUST adhere to the following 
+formula: 
+
+virtual_block (x) = extent_block (MOD(x/L), i, FLOOR(FLOOR(x/L)/(N-1)) 
+
+The values of the parity blocks MUST be calculated according to the following formula: 
+
+Eq. 10 
+
+Eq. 11 
+
+Eq. 12 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+29 
+
+Eq. 13 
+
+N
+
+,1
+≠−
+
+pi
+
+parity_block (k, p, j) =  ⊕
+
+i
+
+=
+
+0
+
+ extent_block (k, i, j).  
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+30 
+
+4.2.9  RAID-5 Rotating Parity N with Data Restart (PRL=05, RLQ=02) 
+
+Figure 10 gives an example of an implementation of RAID-5 called Rotating Parity N with Data Restart. 
+The indices and constants listed in Table 6 are valid for this type of RAID. 
+
+ 
+
+Figure 10: Rotating Parity N with Data Restart (PR=05, RLQ=02) Example 
+
+The extent p on which the parity block for a given virtual block x resides MUST adhere to the following 
+formula: 
+
+ 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+31 
+
+p = (N-1)-MOD(FLOOR(FLOOR(x/L)/(N-1)),N). 
+
+The extent i on which a given virtual block x resides MUST adhere to the following formula: 
+
+ 
+
+ 
+
+ 
+
+IF  MOD(FLOOR(x/L),N-1) < p  
+
+THEN  i =  MOD(FLOOR(x/L),N-1) 
+
+ELSE  i = MOD(FLOOR(x/L),N-1)+1. 
+
+The allocation of data blocks in a Rotating Parity N with Data Restart VD MUST adhere to the following 
+formula: 
+
+virtual_block (x) = extent_block (MOD(x/L), i, FLOOR(FLOOR(x/L)/(N-1)) 
+
+The values of the parity blocks MUST be calculated according to the following formula: 
+
+Eq. 14 
+
+Eq. 15 
+
+Eq. 16 
+
+Eq. 17 
+
+N
+
+,1
+≠−
+
+pi
+
+parity_block (k, p, j) =  ⊕
+
+i
+
+=
+
+0
+
+ extent_block (k, i, j).  
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+32 
+
+4.2.10 RAID-5 Rotating Parity N with Data Continuation (PRL=05, RLQ=03) 
+
+Figure 11 gives an example of RAID-5 implemented with Rotating Parity N with Data Continuation. The 
+indices and constants given in Table 6 also apply to the formulas given below for Rotating Parity N with 
+Data Continuation.  
+
+ 
+
+Virtual Disk
+
+ Data Block 0
+
+ Data Block 1
+
+ Data Block 2
+ Data Block 3
+
+ Data Block 4
+
+ Data Block 5
+
+ Data Block 6
+
+ Data Block 7
+ Data Block 8
+ Data Block 9
+
+ Data Block 10
+
+ Data Block 11
+ Data Block 12
+
+ Data Block 13
+ Data Block 14
+ Data Block 15
+
+n
+o
+i
+t
+c
+n
+u
+F
+ 
+g
+n
+p
+p
+a
+M
+
+i
+
+Strip (2,0)
+
+ Data Block 8
+
+ Data Block 9
+
+ Data Block 10
+
+ Data Block 11
+
+Strip (2,1)
+
+ Data Block 28
+ Data Block 29
+
+ Data Block 30
+ Data Block 31
+
+Strip (2,2)
+
+Parity (0,2,2)
+Parity (1,2,2)
+Parity (2,2,2)
+Parity (3,2,2)
+
+Stripe 0
+
+Depth
+
+Stripe 1
+
+Depth
+
+Stripe 2
+
+Depth
+
+Extent 0
+
+Strip (0,0)
+
+ Data Block 0
+ Data Block 1
+ Data Block 2
+
+ Data Block 3
+
+Strip (0,1)
+
+ Data Block 20
+ Data Block 21
+
+ Data Block 22
+ Data Block 23
+
+Strip (0,2)
+ Data Block 40
+ Data Block 41
+ Data Block 42
+ Data Block 43
+
+Extent 1
+
+Strip (1,0)
+
+ Data Block 4
+
+ Data Block 5
+ Data Block 6
+ Data Block 7
+
+Strip (1,1)
+
+ Data Block 24
+
+ Data Block 25
+ Data Block 26
+
+ Data Block 27
+
+Strip (1,2)
+
+ Data Block 44
+ Data Block 45
+ Data Block 46
+ Data Block 47
+
+Extent 2
+
+Extent 3
+
+Extent Stripe Length
+
+Strip (3,0)
+
+ Data Block 12
+
+ Data Block 13
+
+ Data Block 14
+
+ Data Block 15
+
+Strip (3,1)
+
+Parity (0,3,1)
+Parity (1,3,1)
+
+Parity (2,3,1)
+Parity (3,3,1)
+
+Strip (3,2)
+
+ Data Block 32
+ Data Block 33
+ Data Block 34
+ Data Block 35
+
+Extent 4
+
+Strip (4,0)
+
+Parity (0,4,0)
+Parity (1,4,0)
+
+Parity (2,4,0)
+Parity (3,4,0)
+
+Strip (4,1)
+
+ Data Block 16
+ Data Block 17
+
+ Data Block 18
+ Data Block 19
+
+Strip (4,2)
+
+ Data Block 36
+ Data Block 37
+ Data Block 38
+ Data Block 39
+
+Figure 11:  Rotating Parity N with Data Continuation (PRL=05, RLQ=03) Example 
+
+ 
+
+33 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+The extent p on which the parity block for a given virtual block x resides MUST adhere to the following 
+formula: 
+
+p = (N-1)-MOD(FLOOR(FLOOR(x/L)/(N-1)),N). 
+
+The extent i on which a given virtual block x resides MUST adhere to the following formula: 
+
+i = MOD(MOD(FLOOR(x/L),(N-1))+p+1),N). 
+
+The allocation of data blocks in a Rotating Parity N with Data Continuation VD MUST adhere to the 
+following formula: 
+
+virtual_block (x) = extent_block (MOD(x/L), i, FLOOR(FLOOR(x/L)/(N-1)) 
+
+The values of the parity blocks MUST be calculated according to the following formula: 
+
+Eq. 18 
+
+Eq. 19 
+
+Eq. 20 
+
+Eq. 21 
+
+N
+
+,1
+≠−
+
+pi
+
+parity_block (k, p, j) =  ⊕
+
+i
+
+=
+
+0
+
+ extent_block (k, i, j).  
+
+ 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+34 
+
+4.2.11 RAID-5E Rotating Parity 0 with Data Restart (PRL=15, RLQ=00) 
+
+Figure 12 gives an example of RAID-5E implemented with Rotating Parity 0 with Data Restart.  
+
+n
+o
+
+ 
+
+i
+t
+c
+n
+u
+F
+g
+n
+p
+p
+a
+M
+
+i
+
+Figure 12:  RAID-5E Rotating Parity 0 with Data Restart (PRL-15, RLQ=00) Example 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+ 
+
+35 
+
+RAID-5E has hot space at the end of each extent. In the event of an extent failure, the hot space on the 
+remaining extents is used to rebuild and re-stripe the data in a manner that the remaining extents become 
+a RAID-5 VD.  
+
+Table 7 gives the indices and constants used to describe the data layout of this type of RAID in the 
+following formulas. 
+
+Table 7:  Indices and Constants for RAID-5E 
+
+Variable or Index 
+
+Description 
+
+Minimum Value 
+
+Maximum Value 
+
+i 
+
+j 
+
+k 
+
+L 
+M 
+
+N 
+
+x 
+
+p 
+
+U 
+
+W 
+
+Index of an extent of a 
+VD 
+Index of a stripe in a VD 
+
+Offset of a block from 
+the beginning of a strip 
+Size of a strip in blocks 
+Number of data blocks 
+in a VD. M MUST be 
+evenly divisible by (N-
+1)*L 
+Number of extents in a 
+VD 
+Offset of a data block 
+from the beginning of a 
+VD 
+Index of the extent on 
+which the parity_blocks 
+for a given stripe reside 
+Number of hot space 
+blocks 
+Index of the last stripe 
+containing data blocks 
+
+N-1 
+
+FLOOR(FLOOR((M-
+1)/L)/(N-1)) 
+L-1 
+
+N/A (a fixed value) 
+N/A (a fixed value) 
+
+N/A (a fixed value) 
+N/A (a fixed value) 
+
+N/A (a fixed value) 
+
+N/A (a fixed value) 
+
+0 
+
+0 
+
+0 
+
+0 
+
+0 
+
+M-1 
+
+N-1 
+
+≥ ((M/(N-1)) * N) - M 
+
+≥ ((M/(N-1)) * N) - M 
+
+FLOOR(FLOOR((M-
+1)/L)/(N-1)) 
+
+FLOOR(FLOOR((M-
+1)/L)/(N-1)) 
+
+ 
+
+The extent p on which the parity block for a given virtual block x resides MUST adhere to the following 
+formula: 
+
+The extent i on which a given virtual block x resides MUST adhere to the following formula: 
+
+p = MOD(FLOOR(FLOOR(x/L)/(N-1)),N). 
+
+Eq. 22 
+
+Eq. 23 
+
+ 
+
+ 
+
+ 
+
+IF  MOD(FLOOR(x/L),N-1) < p  
+
+THEN  i =  MOD(FLOOR(x/L),N-1)  
+
+ELSE  i = MOD(FLOOR(x/L),N-1)+1. 
+
+The allocation of data blocks in a RAID-5E Rotating Parity 0 with Data Restart VD MUST adhere to the 
+following formula: 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+36 
+
+virtual_block (x) = extent_block (MOD(x/L), i, FLOOR(FLOOR(x/L)/(N-1)) 
+
+The values of the parity blocks MUST be calculated according to the following formula: 
+
+parity_block (k, p, j) =  ⊕
+
+i
+
+=
+
+0
+
+ extent_block (k, i, j).  
+
+The number of hot space blocks U MUST adhere to the following formula: 
+
+Eq. 24 
+
+Eq. 25 
+
+N
+
+,1
+≠−
+
+pi
+
+Eq. 26 
+
+U ≥ ((M/(N-1)) * N) - M 
+
+Hot space blocks MUST begin at offset M from the beginning of the VD. The total number of blocks in the 
+VD MUST equal M+U. The hot space blocks MUST be evenly distributed across all extents. All hot space 
+blocks on an extent MUST reside at the end of the extent. 
+
+In the event of an extent failure, the controller MUST reallocate the data as described in Section 4.2.8. 
+The number of extents used in the resulting RAID-5 VD MUST be equal to the number of extents used in 
+the RAID-5E VD reduced by one. 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+37 
+
+4.2.12 RAID-5E Rotating Parity N with Data Restart (PRL=15, RLQ=02) 
+
+Figure 13 gives an example of a RAID-5E implementation utilizing Rotating Parity N with Data Restart. 
+The indices and constants listed in Table 7 are valid for this type of RAID. 
+
+Figure 13:  RAID-5E Rotating Parity N with Data Restart (PRL=15, RLQ=02) Example 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+ 
+
+38 
+
+ 
+
+The extent p on which the parity block for a given virtual block x resides MUST adhere to the following 
+formula: 
+
+p = (N-1)-MOD(FLOOR(FLOOR(x/L)/(N-1)),N). 
+
+The extent i on which a given virtual block x resides MUST adhere to the following formula: 
+
+ 
+
+ 
+
+ 
+
+IF  MOD(FLOOR(x/L),N-1) < p  
+
+THEN  i =  MOD(FLOOR(x/L),N-1) 
+
+ELSE  i = MOD(FLOOR(x/L),N-1)+1. 
+
+The allocation of data blocks in a RAID-5E Rotating Parity N with Data Restart VD MUST adhere to the 
+following formula: 
+
+virtual_block (x) = extent_block (MOD(x/L), i, FLOOR(FLOOR(x/L)/(N-1)) 
+
+The values of the parity blocks MUST be calculated according to the following formula: 
+
+parity_block (k, p, j) =  ⊕
+
+i
+
+=
+
+0
+
+ extent_block (k, i, j).  
+
+The number of hot space blocks U MUST adhere to the following formula: 
+
+U ≥ ((M/(N-1)) * N) - M 
+
+Hot space blocks MUST begin at offset M from the beginning of the VD. The total number of blocks in the 
+VD MUST equal M+U. The hot space blocks MUST be evenly distributed across all extents. All hot space 
+blocks on an extent MUST reside at the end of the extent. 
+
+In the event of an extent failure, the controller MUST reallocate the data as described in Section 4.2.9. 
+The number of extents used in the resulting RAID-5 VD MUST be equal to the number of extents used in 
+the RAID-5E VD reduced by one. 
+
+Eq. 27 
+
+Eq. 28 
+
+Eq. 29 
+
+Eq. 30 
+
+N
+
+,1
+≠−
+
+pi
+
+Eq. 31 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+39 
+
+4.2.13 RAID-5E Rotating Parity N with Data Continuation (PRL=15, RLQ=03) 
+
+Figure 14 gives an example of a RAID-5E volume implemented utilizing Rotating Party N with Data 
+Continuation. The indices and constants listed in Table 7 are valid for this type of RAID. 
+
+Figure 14: RAID-5E Rotating Parity N with Data Continuation (PRL=15, RLQ=03) Example 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+ 
+
+40 
+
+ 
+
+The extent p on which the parity block for a given virtual block x resides MUST adhere to the following 
+formula: 
+
+p = (N-1)-MOD(FLOOR(FLOOR(x/L)/(N-1)),N). 
+
+The extent i on which a given virtual block x resides MUST adhere to the following formula: 
+
+i = MOD(MOD(FLOOR(x/L),(N-1))+p+1),N). 
+
+The allocation of data blocks in a RAID-5E Rotating Parity N with Data Continuation VD MUST adhere to 
+the following formula: 
+
+virtual_block (x) = extent_block (MOD(x/L), i, FLOOR(FLOOR(x/L)/(N-1)) 
+
+The values of the parity blocks MUST be calculated according to the following formula: 
+
+parity_block (k, p, j) =  ⊕
+
+i
+
+=
+
+0
+
+ extent_block (k, i, j). 
+
+The number of hot space blocks U MUST adhere to the following formula: 
+
+U ≥ ((M/(N-1)) * N) - M 
+
+Hot space blocks MUST begin at offset M from the beginning of the VD. The total number of blocks in the 
+VD MUST equal M+U. The hot space blocks MUST be evenly distributed across all extents. All hot space 
+blocks on an extent MUST reside at the end of the extent. 
+
+In the event of an extent failure, the controller MUST reallocate the data as described in Section 4.2.10. 
+The number of extents used in the resulting RAID-5 VD MUST be equal to the number of extents used in 
+the RAID-5E VD reduced by one. 
+
+Eq. 32 
+
+Eq. 33 
+
+Eq. 34 
+
+Eq. 35 
+
+N
+
+,1
+≠−
+
+pi
+
+Eq. 36 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+41 
+
+4.2.14 RAID-5EE Rotating Parity 0 with Data Restart (PRL=25, RLQ=00) 
+
+Figure 15 gives an example of RAID-5EE implemented with Rotating Parity 0 with Data Restart. RAID-
+5EE has hot space distributed across the extents. In the event of an extent failure, the hot space on the 
+remaining extents is used to rebuild and re-stripe the data in a manner that the remaining extents become 
+a RAID-5 VD. Table 8 gives the indices and constants used to describe the data layout of this type of 
+RAID. 
+
+Figure 15:  RAID-5EE Rotating Parity 0 with Data Restart (PRL=25, RLQ=00) Example 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+ 
+
+42 
+
+Table 8:  Indices and Constants for RAID-5EE 
+
+Variable or Index 
+
+Description 
+
+Minimum Value 
+
+Maximum Value 
+
+N-1 
+
+FLOOR(FLOOR(M-
+1/L)/(N-2)) 
+L-1 
+
+N/A (a fixed value) 
+N/A (a fixed value) 
+
+N/A (a fixed value) 
+N/A (a fixed value) 
+
+N/A (a fixed value) 
+
+N/A (a fixed value) 
+
+i 
+
+j 
+
+k 
+
+L 
+M 
+
+N 
+
+x 
+
+p 
+
+h 
+
+Index of an extent of a 
+VD 
+Index of a stripe in a VD 
+
+Offset of a block from 
+the beginning of a strip 
+Size of a strip in blocks 
+Number of data blocks 
+in a VD. M MUST be 
+evenly divisible by (N-
+2)*L 
+Number of extents in a 
+VD 
+Offset of a data block 
+from the beginning of a 
+VD 
+Index of the extent on 
+which the parity_blocks 
+for a given stripe reside 
+Index of the extent on 
+which the hot space for 
+a given stripe resides 
+
+0 
+
+0 
+
+0 
+
+0 
+
+0 
+
+0 
+
+M-1 
+
+N-1 
+
+N-1 
+
+ 
+
+The stripe j on which a given virtual block x resides MUST adhere to the following formula: 
+
+The extent p on which the parity for a given stripe j resides MUST adhere to the following formula: 
+
+The extent h on which hot space for a given stripe j resides MUST adhere to the following formula: 
+
+The extent i on which a given virtual block x resides MUST adhere to the following formula: 
+
+Eq. 37 
+
+j = FLOOR(FLOOR(x/L)/(N-2)) 
+
+Eq. 38 
+
+p = MOD(j,N). 
+
+Eq. 39 
+
+h = MOD((p+1),N). 
+
+Eq. 40 
+
+IF MOD(FLOOR(x/L),N-2) < p 
+
+THEN  
+
+IF MOD(FLOOR(x/L),N-2) < h 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+43 
+
+THEN  
+
+ELSE  
+
+i = MOD(FLOOR(x/L),N-2) 
+
+i = MOD(FLOOR(x/L),N-2)+1 
+
+ELSE  
+
+i = MOD(FLOOR(x/L,1),N-2)+2 
+
+The allocation of data blocks in a RAID-5EE Rotating Parity 0 with Data Restart VD MUST adhere to the 
+following formula: 
+
+virtual_block(x) = extent_block(MOD(x/L), i, j) 
+
+The values of the party blocks MUST be calculated according to the following formula: 
+
+Eq. 41 
+
+Eq. 42 
+
+ 
+
+In the event of an extent failure, the controller MUST reallocate the data as describe in Section 4.2.8. The 
+number of extents used in the resulting RAID-5 VD MUST be equal to the number of extents used in the 
+RAID-5EE volume reduced by one. 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+44 
+
+4.2.15 RAID-5EE Rotating Parity N with Data Restart (PRL=25, RLQ=02) 
+
+Figure 16 gives an example of RAID-5EE implemented with Rotating Parity N with Data Restart. The 
+indices and constants given in Table 8 are used in the description below. 
+
+n
+o
+i
+t
+c
+n
+u
+F
+ 
+g
+n
+p
+p
+a
+M
+
+i
+
+Figure 16:  RAID-5EE Rotating Parity N with Data Restart (PRL=25, RLQ=02) Example 
+
+The stripe j on which a given virtual block x resides MUST adhere to the following formula: 
+
+ 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+45 
+
+The extent p on which the parity for a given stripe j resides MUST adhere to the following formula: 
+
+The extent h on which hot space for a given stripe j resides MUST adhere to the following formula: 
+
+The extent i on which a given virtual block x resides MUST adhere to the following formula: 
+
+j = FLOOR(FLOOR(x/L)/(N-2)). 
+
+Eq. 43 
+
+Eq. 44 
+
+p = (N-1) - MOD(j,N). 
+
+Eq. 45 
+
+h = MOD((p-1),N). 
+
+Eq. 46 
+
+IF MOD(FLOOR(x/L),N-2) < h 
+
+THEN  
+
+IF MOD(FLOOR(x/L),N-2) < p 
+
+THEN  
+
+ELSE  
+
+i = MOD(FLOOR(x/L),N-2) 
+
+i = MOD(FLOOR(x/L),N-2)+1 
+
+ELSE  
+
+i = MOD(FLOOR(x/L,1),N-2)+2 
+
+The allocation of data blocks in a RAID-5EE Rotating Parity N with Data Restart VD MUST adhere to the 
+following formula: 
+
+virtual_block(x) = extent_block(MOD(x/L), i, j). 
+
+The values of the party blocks MUST be calculated according to the following formula: 
+
+Eq. 47 
+
+Eq. 48 
+
+ 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+46 
+
+In the event of an extent failure, the controller MUST reallocate the data as describe in Section 4.2.9. The 
+number of extents used in the resulting RAID-5 VD MUST be equal to the number of extents used in the 
+RAID-5EE volume reduced by one. 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+47 
+
+4.2.16 RAID-5EE Rotating Parity N with Data Continuation (PRL=25, RLQ=03) 
+
+Figure 17 gives an example of RAID-5EE implemented with Rotating Party N with Data Continuation. The 
+indices and constants given in Table 8 are used in the description below. 
+
+Virtual Disk
+
+ Data Block 0
+
+ Data Block 1
+
+ Data Block 2
+
+ Data Block 3
+
+ Data Block 4
+
+ Data Block 5
+
+ Data Block 6
+
+ Data Block 7
+ Data Block 8
+
+ Data Block 9
+
+ Data Block 10
+
+ Data Block 11
+
+ Data Block 12
+
+ Data Block 13
+ Data Block 14
+
+ Data Block 15
+
+n
+o
+i
+t
+c
+n
+u
+F
+ 
+g
+n
+p
+p
+a
+M
+
+i
+
+Strip (2,0)
+
+ Data Block 8
+
+ Data Block 9
+ Data Block 10
+
+ Data Block 11
+
+Strip (2,1)
+ HS Block 4
+
+ HS Block 5
+
+ HS Block 6
+
+ HS Block 7
+
+Strip (2,2)
+Parity (0,2,2)
+
+Parity (1,2,2)
+Parity (2,2,2)
+
+Parity (3,2,2)
+
+Stripe 0
+
+Depth
+
+Stripe 1
+
+Depth
+
+Stripe 2
+
+Depth
+
+Extent 0
+
+Strip (0,0)
+ Data Block 0
+ Data Block 1
+
+ Data Block 2
+ Data Block 3
+
+Strip (0,1)
+ Data Block 16
+ Data Block 17
+
+ Data Block 18
+
+ Data Block 19
+
+Strip (0,2)
+ Data Block 32
+
+ Data Block 33
+ Data Block 34
+
+ Data Block 35
+
+Extent 1
+
+Strip (1,0)
+
+ Data Block 4
+
+ Data Block 5
+ Data Block 6
+
+ Data Block 7
+
+Strip (1,1)
+
+ Data Block 20
+
+ Data Block 21
+ Data Block 22
+
+ Data Block 23
+
+Strip (1,2)
+ HS Block 8
+
+ HS Block 9
+
+ HS Block 10
+ HS Block 11
+
+Extent 2
+
+Extent 3
+
+Extent Stripe Length
+
+Strip (3,0)
+
+ HS Block 0
+
+ HS Block 1
+ HS Block 2
+
+ HS Block 3
+
+Strip (3,1)
+Parity (0,3,1)
+
+Parity (1,3,1)
+
+Parity (2,3,1)
+
+Parity (3,3,1)
+
+Strip (3,2)
+ Data Block 24
+
+ Data Block 25
+ Data Block 26
+
+ Data Block 27
+
+Extent 4
+
+Strip (4,0)
+
+Parity (0,4,0)
+Parity (1,4,0)
+
+Parity (2,4,0)
+Parity (3,4,0)
+
+Strip (4,1)
+ Data Block 12
+
+ Data Block 13
+
+ Data Block 14
+
+ Data Block 15
+
+Strip (4,2)
+ Data Block 28
+
+ Data Block 29
+ Data Block 30
+
+ Data Block 31
+
+Figure 17:  RAID-5EE Rotating Parity N with Data Continuation (PRL=25, RLQ=03) Example 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+ 
+
+48 
+
+ 
+
+The strip j on which a given virtual block x resides MUST adhere to the following formula: 
+
+The extent p on which the parity for a given stripe j resides MUST adhere to the following formula: 
+
+j = FLOOR(FLOOR(x/L)/(N-2)). 
+
+p = (N-1) - MOD(j,N). 
+
+Eq. 51 
+
+h = MOD((p-1),N). 
+
+Eq. 49 
+
+Eq. 50 
+
+Eq. 52 
+
+Eq. 53 
+
+Eq. 54 
+
+The extent h on which hot space for a given stripe j resides MUST adhere to the following formula: 
+
+The extent i on which a given virtual block x resides MUST adhere to the following formula: 
+
+i = MOD(MOD(FLOOR(x/L),N-2)+p+1,N). 
+
+The allocation of data blocks in a RAID-5EE Rotating Parity N with Data Restart VD MUST adhere to the 
+following formula: 
+
+virtual_block(x) = extent_block(MOD(x/L), i, j). 
+
+The values of the party blocks MUST be calculated according to the following formula: 
+
+In the event of an extent failure, the controller MUST reallocate the data as describe in Section 4.2.10. 
+The number of extents used in the resulting RAID-5 VD MUST be equal to the number of extents used in 
+the RAID-5EE volume reduced by one. 
+
+ 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+49 
+
+4.2.17 RAID-5R Rotating Parity 0 after R Stripes with Data Restart (PRL=35, RLQ=00) 
+
+Figure 18 gives an example of RAID-5R Rotating Parity 0 after R Stripes with Data Restart. Table 9 gives 
+the indices and constants used to describe the data layout of this type of RAID in the following formulas. 
+
+Figure 18:  RAID-5R Rotating Parity 0 after R Stripes with Data Restart (PRL=35, RLQ=00) Example 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+ 
+
+50 
+
+Table 9:  Indices and Constants for RAID-5R Rotating Parity 0 and N 
+
+Variable or Index 
+
+Description 
+
+Minimum Value 
+
+Maximum Value 
+
+i 
+
+j 
+
+k 
+
+L 
+M 
+
+N 
+
+R 
+
+x 
+
+p 
+
+Index of an extent of a 
+VD 
+Index of a stripe in a VD 
+
+Offset of a block from 
+the beginning of a strip 
+Size of a strip in blocks 
+Number of data blocks 
+in a VD. M MUST be 
+evenly divisible by (N-
+1)*L*R 
+Number of extents in a 
+VD 
+Number of stripes 
+before rotating Parity 
+(where R=2^n) 
+Offset of a data block 
+from the beginning of a 
+VD 
+Index of the extent on 
+which the parity_blocks 
+for a given stripe reside 
+
+N-1 
+
+FLOOR(FLOOR((M-
+1)/L)/(N-1)) 
+L-1 
+
+N/A (a fixed value) 
+N/A (a fixed value) 
+
+N/A (a fixed value) 
+N/A (a fixed value) 
+
+N/A (a fixed value) 
+
+N/A (a fixed value) 
+
+1 (default) 
+
+0x80000000 
+
+0 
+
+0 
+
+0 
+
+0 
+
+0 
+
+M-1 
+
+N-1 
+
+ 
+
+The extent p on which the parity block for a given virtual block x resides MUST adhere to the following 
+formula: 
+
+p = MOD(FLOOR(FLOOR(x/(L*R))/(N-1)),N). 
+
+The extent i on which a given virtual block x  resides MUST adhere to the following formula: 
+
+ 
+
+IF  MOD(FLOOR(x/(L*R)),N-1) < p  
+
+ 
+
+ 
+
+THEN  i =  MOD(FLOOR(x/(L*R)),N-1)  
+
+ELSE  i = MOD(FLOOR(x/(L*R)),N-1)+1. 
+
+The allocation of data blocks in a Rotating Parity 0 with Data Restart VD MUST adhere to the following 
+formula: 
+
+virtual_block (x) = extent_block (MOD(x,L), i, FLOOR(FLOOR(x/L)/(N-1)) 
+
+The values of the parity blocks MUST be calculated according to the following formula: 
+
+Eq. 55 
+
+Eq. 56 
+
+Eq. 57 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+51 
+
+Eq. 58 
+
+N
+
+,1
+≠−
+
+pi
+
+parity_block (k, p, j) =  ⊕
+
+i
+
+=
+
+0
+
+ extent_block (k, i, j).  
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+52 
+
+4.2.18 RAID-5R Rotating Parity N after R Stripes with Data Restart (PRL=35, RLQ=02) 
+
+Figure 19 gives an example of an implementation of RAID-5 Rotating Parity N after R Stripes with Data 
+Restart. The indices and constants listed in Table 9 are valid for this type of RAID. 
+
+Virtual Disk
+
+ Data Block 0
+ Data Block 1
+
+ Data Block 2
+ Data Block 3
+ Data Block 4
+ Data Block 5
+ Data Block 6
+ Data Block 7
+ Data Block 8
+ Data Block 9
+ Data Block 10
+ Data Block 11
+
+ Data Block 12
+ Data Block 13
+ Data Block 14
+
+ Data Block 15
+
+Strip (2,0)
+ Data Block 8
+
+ Data Block 9
+
+ Data Block 10
+ Data Block 11
+
+Strip (2,1)
+ Data Block 24
+ Data Block 25
+ Data Block 26
+
+ Data Block 27
+
+Strip (2,2)
+ Data Block 40
+ Data Block 41
+
+ Data Block 42
+
+ Data Block 43
+
+Strip (2,3)
+ Data Block 56
+ Data Block 57
+
+ Data Block 58
+
+ Data Block 59
+
+Strip (2,4)
+Parity (0,2,4)
+Parity (1,2,4)
+Parity (2,2,4)
+
+Parity (3,2,4)
+
+Stripe 0
+
+Depth
+
+Stripe 1
+
+Depth
+
+Stripe 2
+
+Depth
+
+Stripe 3
+
+Depth
+
+Stripe 4
+
+Depth
+
+Extent 0
+
+Strip (0,0)
+Data Block 0
+Data Block 1
+
+Data Block 2
+Data Block 3
+
+Strip (0,1)
+ Data Block 16
+
+ Data Block 17
+ Data Block 18
+ Data Block 19
+
+Strip (0,2)
+ Data Block 32
+ Data Block 33
+
+ Data Block 34
+
+ Data Block 35
+
+Strip (0,3)
+ Data Block 48
+ Data Block 49
+ Data Block 50
+
+ Data Block 51
+
+Strip (0,4)
+ Data Block 64
+ Data Block 65
+ Data Block 66
+
+ Data Block 67
+
+Extent 1
+
+Strip (1,0)
+ Data Block 4
+ Data Block 5
+
+ Data Block 6
+ Data Block 7
+
+Strip (1,1)
+ Data Block 20
+
+ Data Block 21
+ Data Block 22
+ Data Block 23
+
+Strip (1,2)
+ Data Block 36
+ Data Block 37
+
+ Data Block 38
+ Data Block 39
+
+Strip (1,3)
+ Data Block 52
+ Data Block 53
+ Data Block 54
+
+ Data Block 55
+
+Strip (1,4)
+ Data Block 68
+ Data Block 69
+
+ Data Block 70
+ Data Block 71
+
+Extent 2
+
+Extent 3
+
+Extent Stripe Length
+
+Strip (3,0)
+ Data Block 12
+ Data Block 13
+ Data Block 14
+
+ Data Block 15
+
+Strip (3,1)
+ Data Block 28
+ Data Block 29
+
+ Data Block 30
+ Data Block 31
+
+Strip (3,2)
+Parity (0,3,2)
+Parity (1,3,2)
+
+Parity (2,3,2)
+
+Parity (3,3,2)
+
+Strip (3,3)
+Parity (0,3,3)
+Parity (1,3,3)
+
+Parity (2,3,3)
+
+Parity (3,3,3)
+
+Strip (3,4)
+ Data Block 72
+ Data Block 73
+ Data Block 74
+
+ Data Block 75
+
+Extent 4
+
+Strip (4,0)
+
+Parity (0,4,0)
+Parity (1,4,0)
+Parity (2,4,0)
+
+Parity (3,4,0)
+
+Strip (4,1)
+
+Parity (0,4,1)
+Parity (1,4,1)
+
+Parity (2,4,1)
+Parity (3,4,1)
+
+Strip (4,2)
+ Data Block 44
+ Data Block 45
+
+ Data Block 46
+
+ Data Block 47
+
+Strip (4,3)
+
+ Data Block 60
+ Data Block 61
+
+ Data Block 62
+
+ Data Block 63
+
+Strip (4,4)
+ Data Block 76
+ Data Block 77
+ Data Block 78
+
+ Data Block 79
+
+Figure 19:  RAID-5R Rotating Parity N after R Stripes with Data Restart (PR=35, RLQ=02) Example 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+ 
+
+53 
+
+The extent p on which the parity block for a given virtual block x resides MUST adhere to the following 
+formula: 
+
+p = (N-1)-MOD(FLOOR(FLOOR(x/(L*R))/(N-1)),N). 
+
+The extent i on which a given virtual block x  resides MUST adhere to the following formula: 
+
+ 
+
+IF  MOD(FLOOR(x/(L*R)),N-1) < p  
+
+ 
+
+ 
+
+THEN  i =  MOD(FLOOR(x/(L*R)),N-1) 
+
+ELSE  i = MOD(FLOOR(x/(L*R)),N-1)+1. 
+
+The allocation of data blocks in a Rotating Parity N with Data Restart VD MUST adhere to the following 
+formula: 
+
+virtual_block (x) = extent_block (MOD(x,L), i, FLOOR(FLOOR(x/L)/(N-1)) 
+
+The values of the parity blocks MUST be calculated according to the following formula: 
+
+Eq. 59 
+
+Eq. 60 
+
+Eq. 61 
+
+Eq. 62 
+
+N
+
+,1
+≠−
+
+pi
+
+parity_block (k, p, j) =  ⊕
+
+i
+
+=
+
+0
+
+ extent_block (k, i, j).  
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+54 
+
+4.2.19 RAID-5R Rotating Parity N after R Stripes with Data Continuation (PRL=35, 
+
+RLQ=03) 
+
+Figure 20 gives an example of RAID-5 Rotating Parity N after R Stripes with Data Continuation. The 
+indices and constants given in Table 9 also apply to the formulas given below.  
+
+Figure 20:  RAID-5R Rotating Parity N after R Stripes with Data Continuation (PRL=35, RLQ=03) Example 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+ 
+
+55 
+
+ 
+
+The extent p on which the parity block for a given virtual block x resides MUST adhere to the following 
+formula: 
+
+p = (N-1)-MOD(FLOOR(FLOOR(x/(L*R))/(N-1)),N). 
+
+The extent i on which a given virtual block x  resides MUST adhere to the following formula: 
+
+i = MOD(MOD(FLOOR(x/(L*R)),(N-1))+p+1),N). 
+
+The allocation of data blocks in a Rotating Parity N with Data Continuation VD MUST adhere to the 
+following formula: 
+
+virtual_block (x) = extent_block (MOD(x,L), i, FLOOR(FLOOR(x/L)/(N-1)) 
+
+The values of the parity blocks MUST be calculated according to the following formula: 
+
+Eq. 63 
+
+Eq. 64 
+
+Eq. 65 
+
+Eq. 66 
+
+N
+
+,1
+≠−
+
+pi
+
+parity_block (k, p, j) =  ⊕
+
+i
+
+=
+
+0
+
+ extent_block (k, i, j).  
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+56 
+
+4.2.20 RAID-1E Integrated Adjacent Stripe Mirroring (PRL= 11, RLQ=00) 
+
+Figure 21 gives an example of Integrated Adjacent Strip Mirroring. Table 10 gives the indices and 
+constants used to describe the data layout of this type of RAID in the following formulas. 
+
+Figure 21: RAID-1E Integrated Adjacent Stripe Mirroring (PRL= 11, RLQ-00) Example 
+
+ 
+
+ 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+57 
+
+Table 10: Indices and Constants for Integrated Adjacent Strip Mirroring 
+
+Variable or Index 
+
+Description 
+
+Minimum Value 
+
+Maximum Value 
+
+i 
+
+j 
+k 
+
+L 
+M 
+
+N 
+
+q 
+
+r 
+
+x 
+
+Index of an extent of a 
+VD where the primary 
+copy of a virtual_block 
+is stored. 
+Index of a stripe in a VD 
+Offset of a block from 
+the beginning of a strip 
+Size of a strip in blocks 
+Number of data blocks 
+in a VD. M MUST be 
+evenly divisible by N-1. 
+Number of extents in a 
+VD 
+Index of an extent of a 
+VD where the mirrored 
+copy of a virtual_block 
+is stored. 
+Index of the stripe 
+where the mirrored copy 
+of a virtual_block is 
+stored 
+Offset of a data block 
+from the beginning of a 
+VD 
+
+0 
+
+0 
+0 
+
+0 
+
+0 
+
+0 
+
+N-1 
+
+(M/N)-1 
+L-1 
+
+N-1 
+
+(M/N)-1 
+
+M-1 
+
+N/A (a fixed value) 
+N/A (a fixed value) 
+
+N/A (a fixed value) 
+N/A (a fixed value) 
+
+N/A (a fixed value) 
+
+N/A (a fixed value) 
+
+ 
+
+In an Integrated Adjacent Stripe Mirroring VD, each virtual_block(x) MUST be stored in two locations. 
+These two locations are referred to as extent_block (k, i, j) and extent_block’ (k, q, r). The allocation of 
+data in an Integrated Adjacent Stripe Mirroring VD MUST adhere to the following formulas: 
+
+virtual_block (x) = extent_block (MOD(x/L), MOD(FLOOR(x/L)*2, N), FLOOR(FLOOR(x/L)*2/N)) 
+
+virtual_block (x) = extent_block’ (MOD(x/L), MOD((FLOOR(x/L)*2)+1, N), FLOOR(((FLOOR(x/L)*2)+1)/N)  
+
+Eq. 67 
+
+Eq. 68 
+
+ 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+58 
+
+4.2.21 RAID-1E Integrated Offset Stripe Mirroring (PRL=11, RLQ=01) 
+
+Figure 22 gives an example of Integrated Offset Stripe Mirroring. The constants and indices given in 
+Table 10 also apply for the following formulas that describe the data layout of an Integrated Offset Stripe 
+Mirroring VD. 
+
+Virtual Disk
+
+ Data Block 0
+
+ Data Block 1
+
+ Data Block 2
+ Data Block 3
+
+ Data Block 4
+ Data Block 5
+
+ Data Block 6
+
+ Data Block 7
+
+ Data Block 8
+ Data Block 9
+
+ Data Block 10
+
+ Data Block 11
+
+ Data Block 12
+
+ Data Block 13
+ Data Block 14
+ Data Block 15
+
+n
+o
+i
+t
+c
+n
+u
+F
+ 
+g
+n
+p
+p
+a
+M
+
+i
+
+Strip (2,0)
+ Data Block 8
+
+ Data Block 9
+ Data Block 10
+
+ Data Block 11
+
+Strip (2,1)
+ Data Block 4
+
+ Data Block 5
+
+ Data Block 6
+ Data Block 7
+
+Strip (2,2)
+ Data Block 28
+
+ Data Block 29
+ Data Block 30
+
+ Data Block 31
+
+Strip (2,3)
+ Data Block 24
+ Data Block 25
+
+ Data Block 26
+ Data Block 27
+
+Stripe 0
+
+Depth
+
+Stripe 1
+
+Depth
+
+Stripe 2
+
+Depth
+
+Stripe 3
+
+Depth
+
+Extent 0
+
+Strip (0,0)
+ Data Block 0
+
+ Data Block 1
+ Data Block 2
+
+ Data Block 3
+
+Strip (0,1)
+ Data Block 16
+
+ Data Block 17
+
+ Data Block 18
+ Data Block 19
+
+Strip (0,2)
+ Data Block 20
+
+ Data Block 21
+ Data Block 22
+
+ Data Block 23
+
+Strip (0,3)
+ Data Block 36
+ Data Block 37
+
+ Data Block 38
+ Data Block 39
+
+Extent 1
+
+Strip (1,0)
+ Data Block 4
+
+ Data Block 5
+ Data Block 6
+
+ Data Block 7
+
+Strip (1,1)
+ Data Block 0
+
+ Data Block 1
+
+ Data Block 2
+ Data Block 3
+
+Strip (1,2)
+ Data Block 24
+
+ Data Block 25
+ Data Block 26
+
+ Data Block 27
+
+Strip (1,3)
+ Data Block 20
+ Data Block 21
+
+ Data Block 22
+ Data Block 23
+
+Extent 2
+
+Extent 3
+
+Extent 4
+
+Extent Stripe Length
+
+Strip (3,0)
+ Data Block 12
+
+ Data Block 13
+ Data Block 14
+
+ Data Block 15
+
+Strip (3,1)
+ Data Block 8
+
+ Data Block 9
+
+ Data Block 10
+ Data Block 11
+
+Strip (3,2)
+ Data Block 32
+
+ Data Block 33
+ Data Block 34
+
+ Data Block 35
+
+Strip (3,3)
+ Data Block 28
+ Data Block 29
+
+ Data Block 30
+ Data Block 31
+
+Strip (4,0)
+ Data Block 16
+
+ Data Block 17
+ Data Block 18
+
+ Data Block 19
+
+Strip (4,1)
+ Data Block 12
+
+ Data Block 13
+
+ Data Block 14
+ Data Block 15
+
+Strip (4,2)
+ Data Block 36
+ Data Block 37
+
+ Data Block 38
+ Data Block 39
+
+Strip (4,3)
+ Data Block 32
+ Data Block 33
+
+ Data Block 34
+ Data Block 35
+
+Figure 22:  RAID-1E Integrated Offset Stripe Mirroring (PRL= 11, RLQ=01) Example 
+
+ 
+
+59 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+Each virtual_block (x) MUST be stored in two locations. These two locations are referred to as 
+extent_block (k, i, j) and extent_block’ (k, q, r). The allocation of data in an Integrated Offset Stripe 
+Mirroring VD MUST adhere to the following formulas:  
+
+virtual_block (x) = extent_block (MOD(x/L), MOD(FLOOR(x/L), N), FLOOR(FLOOR(x/L)/N))*2) 
+
+ 
+
+ 
+
+Eq. 69 
+
+Eq. 70 
+
+virtual_block (x) = extent_block’ (MOD(x/L), MOD(FLOOR(x/L)+1, N), (FLOOR(FLOOR(x/L)/N)*2)+1)  
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+60 
+
+4.2.22 RAID-6 Rotating Parity 0 with Data Restart (PRL=06, RLQ=01) 
+
+Figure 23 gives an example of RAID-6 called Rotating Parity 0 with Data Restart. Table 11 defines the 
+indices and constants that are used to describe the RAID-6 data layout and parity computation.  
+
+Figure 23: RAID-6 Rotating Parity 0 with Data Restart (PRL=06, RLQ=01) Example 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+ 
+
+61 
+
+ 
+
+Table 11: Indices and Constants for RAID-6 Rotating Parity 0 and N 
+
+Variable or Index 
+
+Description 
+
+Minimum Value 
+
+Maximum Value 
+
+i 
+
+j 
+
+k 
+
+L 
+
+M 
+
+N 
+
+b 
+
+p 
+
+q 
+
+Z 
+
+Ki 
+
+Size of a strip in blocks. 
+
+N/A (a fixed value) 
+
+N/A (a fixed value) 
+
+N/A (a fixed value) 
+
+N/A (a fixed value) 
+
+Index of an extent of a 
+VD 
+
+Index of a stripe in a VD 
+
+Offset of a block from 
+the beginning of a strip. 
+
+Number of data blocks 
+in a VD. M MUST be 
+evenly divisible by (N-
+2)*L.  
+
+Number of extents in a 
+VD. 
+
+Index of a byte in an 
+extent block. 
+
+Index of the extent on 
+which parity P for a 
+given stripe resides.  
+
+Index of the extent on 
+which parity Q for a 
+given byte stripe 
+resides. 
+
+The polynomial used to 
+generate the Galois field 
+elements (required for 
+parity computation).  
+
+The ith Galois field 
+element enumerated in 
+Table 12. 
+
+0 
+
+0 
+
+0 
+
+0 
+
+0 
+
+0 
+
+FLOOR(FLOOR((M-
+1)/L)/(N-2)) 
+
+N-1 
+
+L-1 
+
+N-1 
+
+N-1 
+
+N/A (a fixed value) 
+
+N/A (maximum of 255) 
+
+Block_Size - 1  
+
+N/A (a constant value) 
+
+N/A (a constant value) 
+
+See Table 12 
+
+See Table 12 
+
+The stripe j on which a virtual block x resides MUST adhere to the following formula: 
+
+Eq. 71 
+
+j = FLOOR (FLOOR(x/L)/(N-2)) 
+
+The extent p on which the parity P for a given stripe j resides MUST adhere to the following formula: 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+62 
+
+Eq. 72 
+
+p = MOD (FLOOR ((FLOOR (x/L))/(N-2)), N) 
+
+The extent q on which the parity Q for a given stripe j resides must adhere to the following formula: 
+
+The extent i on which a given virtual block x resides MUST adhere to the following formula: 
+
+Eq. 73 
+
+q = MOD (1+p, N) 
+
+Eq. 74 
+
+IF MOD (FLOOR (x/L), N-2) < p  
+
+THEN { 
+
+ i = MOD (FLOOR (x/L), N-2) 
+
+     
+
+IF p+2 > N 
+
+THEN   i = i + MOD (p+2, N) 
+
+}   
+
+ELSE 
+
+     
+
+i =  MOD (FLOOR (x/L), N-2) + 2   
+
+Eq. 75 
+
+Eq. 76 
+
+N
+
+−
+
+,1
+
+,
+qipi
+≠
+
+≠
+
+Eq. 77 
+
+The allocation of data blocks in a Rotating Parity 0 with Data Restart VD MUST adhere to the following 
+formula: 
+
+virtual_block (x) = extent_block (MOD(x, L), i, j)  
+
+The values of the parity P and Q MUST be computed according to the following formula: 
+
+Parity P (k, p, j) =   ⊕
+
+i
+
+=
+
+0
+
+ extent_block (k,i, j). 
+
+The operator  ⊕  refers to bit-wise XOR of the operands.  
+
+Parity_Byte Q (b,k,q,j) = ∑
+
+i
+
+=
+
+0
+
+,1
+qipiNi
+≠−=
+
+≠
+
+,
+
+Ki  ⊗  extent_block_byte (b,k,i,j) 
+
+The operators ∑ and ⊗  refers to Galois field addition and Galois field multiplication respectively.  The 
+value for constant Ki MUST adhere to the following formula:   
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+63 
+
+Ki = GFILOG(i) 
+
+Eq. 78 
+
+Eq. 79 
+
+b
+
+<
+
+Block_Size
+
+Parity Q (k,q,j) =  ∀
+
+b
+
+=
+
+0
+
+Parity_Byte Q (b,k,q,j) 
+
+Notes:  
+
+1.  The notation  ∀  implies that Parity Q (k,q,j) is a sequential enumeration of the Parity_Byte Q 
+
+(b,k,q,j), where b ranges from 0 to the Block_Size -1.  
+
+2.  Function extent_block_byte (b,k,i,j) returns the bth byte of an extent_block (k,i,j). 
+
+4.2.22.1 
+
+Parity Re-computation on Block Update 
+
+If a data block is updated at byte index b of an extent u, the equations for P and Q parity re-computation 
+MUST be as follows:  
+
+Parity Pnew = extent_block_byte(b,k,p,j)   ⊕  old_extent_block_byte(b,k,u,j) ⊕  
+new_extent_block_byte(b,k,u,j) 
+
+Eq. 80 
+
+ 
+
+Eq. 81 
+
+Parity Qnew  = extent_block_byte(b,k,q,j)  ⊕ Ku  ⊗  old_extent_block_byte(b,k,u,j) ⊕ Ku  ⊗  
+new_extent_block_byte(b,k,u,j)  
+
+Where Ku = GFILOG(u) and  ⊗ refers to Galois multiplication operation. Pnew  and Qnew MUST be re-
+computed for every byte index b updated in the extent u. 
+
+4.2.22.2 
+
+Galois Field Operations 
+
+This section describes how the Galois field operations MUST be defined to calculate Parity Q for the 
+RAID 6 algorithms described in Sections 4.2.22, 4.2.23, and 4.2.24. 
+
+4.2.22.2.1  GFILOG () Function (Z = 0x11D)  
+
+The following table lists the Galois field elements generated from the polynomial 0x11D.  
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+64 
+
+Table 12: Galois Field Elements for Polynomial 0x11D 
+
+GGFFIILLOOGG((00xxRRSS))  
+
+SS  
+
+EE  
+
+99  
+
+88  
+
+77  
+
+66  
+
+55  
+
+CC  
+
+BB  
+
+AA  
+
+DD  
+
+33  
+88  
+
+22  
+44  
+
+11  
+22  
+
+44  
+FF  
+00  
+1100   2200   4400   8800   11DD   33AA   7744   EE88   CCDD   8877   1133   2266  
+11  
+44CC   9988   22DD   55AA   BB44   7755   EEAA   CC99   88FF   0033   0066   00CC   1188   3300   6600   CC00  
+99DD   2277   44EE   99CC   2255   44AA   9944   3355   66AA   DD44   BB55   7777   EEEE   CC11   99ff   2233  
+4466   88CC   0055   00AA   1144   2288   5500   AA00   55DD   BBAA   6699   DD22   BB99   66FF   DDEE   AA11  
+55FF   BBEE   6611   CC22   9999   22FF   55EE   BBCC   6655   CCAA   8899   00FF   11EE   33CC   7788   FF00  
+FFDD   EE77   DD33   BBBB   66BB   DD66   BB11   77FF   FFEE   EE11   DDFF   AA33   55BB   BB66   7711   EE22  
+DD99   AAFF   4433   8866   1111   2222   4444   8888   00DD   11AA   3344   6688   DD00   BBDD   6677   CCEE  
+8811   11FF   33EE   77CC   FF88   EEDD   CC77   9933   33BB   7766   EECC  
+cc55   9977   3333   6666   CCCC  
+8855   1177   22EE   55CC   BB88   66DD   DDAA   AA99   44FF   99EE   2211   4422   8844   1155   22AA   5544  
+AA88   44DD   99AA   2299   5522   AA44   5555   AAAA   4499   9922   3399   7722   EE44   DD55   BB77   7733  
+EE66   DD11   BBFF   6633   CC66   9911   33FF   77EE   FFCC   EE55   DD77   BB33   77BB   FF66   FF11   FFFF  
+EE33   DDBB   AABB   44BB   9966   3311   6622   CC44   9955   3377   66EE   DDCC   AA55   5577   AAEE   4411  
+8822   1199   3322   6644   CC88   88DD   0077   00EE   11CC   3388   7700   EE00   DDDD   AA77   5533   AA66  
+5511   AA22   5599   BB22   7799   FF22   FF99   EEFF   CC33   99BB   22BB   5566   AACC   4455   88AA   0099  
+1122   2244   4488   9900   33DD   77AA   FF44   FF55   FF77   FF33   FFBB   EEBB   CCBB   88BB   00BB   1166  
+22CC   5588   BB00   77DD   FFAA   EE99   CCFF   8833   11BB   3366   66CC   DD88   AADD   4477   88EE   XXXX  
+
+00  
+11  
+22  
+33  
+44  
+55  
+66  
+77  
+88  
+99  
+AA  
+BB  
+CC  
+DD  
+EE  
+FF  
+
+RR  
+
+Note: The values within Table 12 are hexadecimal values.  
+
+GFILOG(0xFF) is undefined and represented as XX. Here are two examples of how to apply Table 12: 
+
+GFILOG(0x8C) = 0x84, 
+
+GFILOG(0x21) = 0x27. 
+
+4.2.22.2.2  GFLOG() Function (Z = 0x11D) 
+
+The following table lists the logarithmic value of the Galois field elements.  
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+65 
+
+Table 13: Log of Galois Field Elements for Polynomial 0x11D 
+
+GGFFLLOOGG((00xxRRSS))  
+
+SS  
+
+00  
+
+11  
+
+22  
+
+33  
+
+44  
+
+55  
+
+66  
+
+77  
+
+88  
+
+99  
+
+AA  
+
+BB  
+
+CC  
+
+DD  
+
+EE  
+
+FF  
+
+XXXX   0000   0011   1199   0022   3322   11AA   CC66   0033   DDFF   3333   EEEE   11BB   6688   CC77   44BB  
+0044   6644   EE00   00EE   3344   88DD   EEFF   8811   11CC   CC11   6699  
+FF88   CC88   0088   44CC   7711  
+0055   88AA   6655   22FF   EE11   2244   00FF   2211   3355   9933   88EE   DDAA   FF00   1122   8822   4455  
+FF99   BB99   CC99   99AA   0099   7788   44DD   EE44   7722   AA66  
+11DD   BB55   CC22   77DD   66AA   2277  
+0066   BBFF   88BB   6622   6666   DDDD   3300   FFDD   EE22   9988   2255   BB33   1100   9911   2222   8888  
+3366   DD00   9944   CCEE   88FF   9966   DDBB   BBDD   FF11   DD22   1133   55CC   8833   3388   4466   4400  
+11EE   4422   BB66   AA33   CC33   4488   77EE   66EE   66BB   33AA   2288   5544   FFAA   8855   BBAA   33DD  
+CCAA   55EE   99BB   99FF   00AA   1155   7799   22BB   44EE   DD44   EE55   AACC   7733   FF33   AA77   5577  
+0077   7700   CC00   FF77   88CC   8800   6633   00DD   6677   44AA   DDEE   EEDD   3311   CC55   FFEE   1188  
+EE33   AA55   9999   7777   2266   BB88   BB44   77CC   1111   4444   9922   DD99   2233   2200   8899   22EE  
+3377   33FF   DD11   55BB   9955   BBCC   CCFF   CCDD   9900   8877   9977   BB22   DDCC   FFCC   BBEE   6611  
+FF22   5566   DD33   AABB   1144   22AA   55DD   99EE   8844   33CC   3399   5533   4477   66DD   4411   AA22  
+11FF   22DD   4433   DD88   BB77   77BB   AA44   7766   CC44   1177   4499   EECC   77FF   00CC   66FF   FF66  
+66CC   AA11   33BB   5522   2299   99DD   5555   AAAA   FFBB   6600   8866   BB11   BBBB   CCCC   33EE   55AA  
+CCBB   5599   55FF   BB00   99CC   AA99   AA00   5511   00BB   FF55   1166   EEBB   77AA   7755   22CC   DD77  
+44FF   AAEE   DD55   EE99   EE66   EE77   AADD   EE88   7744   DD66   FF44   EEAA   AA88   5500   5588   AAFF  
+
+00  
+11  
+22  
+33  
+44  
+55  
+66  
+77  
+88  
+99  
+AA  
+BB  
+CC  
+DD  
+EE  
+FF  
+
+RR  
+
+Note: The values within Table 13 are hexadecimal values. 
+
+GFLOG(0x00) is undefined and represented as XX. Here are three examples of how to apply Table 13. 
+
+GFLOG(0x01) = 0x00,  
+
+GFLOG(0xF9) = 0xD6,  
+
+GFLOG(0x94) = 0x26. 
+
+4.2.22.2.3  Galois Field Addition (∑)  
+
+The Galois field addition operation is defined as the bitwise XOR ( ⊕ ) of the operands. For example, 
+
+∑ (0x22, 0x33, 0x44) = (0x22  ⊕ 0x33  ⊕ 0x44) = 0x55. 
+
+4.2.22.2.4  Galois Field Multiplication ( ⊗ ) 
+
+The Galois field multiplication (a ⊗  b) is defined as:  
+
+Eq. 82 
+
+Eq. 83 
+
+GFILOG (MOD (GFLOG (a) + GFLOG (b), 0xFF)). 
+
+Note: Integer addition applies within Eq. 83. 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+66 
+
+Refer Section 4.2.22.2.2 and Section 4.2.22.2.1 for the definitions of functions GFLOG() and GFILOG() 
+respectively. For example: 
+
+1.  0x33  ⊗  0x44 = GFILOG (MOD (0x7D + 0x66, 0xFF)) = GFILOG (0xE3) = 0x90 
+
+2.  0x08  ⊗ 0x54 = GFILOG (MOD (0x03 + 0x8F, 0xFF)) = GFILOG (0x92) = 0x9A 
+
+ 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+67 
+
+4.2.23 RAID-6 Rotating Parity N with Data Restart (PRL=06, RLQ=02) 
+
+Figure 24 gives an example of an implementation of RAID-6 called Rotating Parity N with Data Restart. 
+The indices and constants provided in Table 11 are valid for this type of RAID. 
+
+Figure 24: RAID-6 Rotating Parity N with Data Restart (PRL=06, RLQ=02) Example 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+ 
+
+68 
+
+The stripe j on which a virtual block x resides MUST adhere to the following formula: 
+
+The extent p on which the parity P for a given stripe j resides must adhere to the following formula: 
+
+p= (N-1) - (MOD (FLOOR ((FLOOR(x/L)) / (N-2) + 1), N)) 
+
+The extent q on which the parity Q for a given stripe j resides must adhere to the following formula: 
+
+j = FLOOR(FLOOR(x/L)/(N-2)) 
+
+Eq. 84 
+
+Eq. 85 
+
+Eq. 86 
+
+q = MOD (1+p, N) 
+
+The extent i on which a given block x resides MUST adhere to the following formula: 
+
+Eq. 87 
+
+IF MOD (FLOOR (x/L), N-2) < p  
+
+ THEN { 
+
+i = MOD (FLOOR (x/L), N-2) 
+
+IF p+2 > N   
+
+THEN i = i + MOD (p+2, N) 
+
+} 
+
+ELSE 
+
+i =  MOD (FLOOR (x/L), N-2) + 2   
+
+The allocation of data blocks in a Rotating Parity N with Data Restart VD MUST adhere to the following 
+formula: 
+
+virtual_block (x) = extent_block (MOD(x, L), i, j)  
+
+The values of the parity P and Q MUST be computed according to the following formula: 
+
+Eq. 88 
+
+Eq. 89 
+
+N
+
+−
+
+,1
+
+,
+qipi
+≠
+
+≠
+
+Parity P (k,p,j) =   ⊕
+
+i
+
+=
+
+0
+
+ extent_block (k,i,j) 
+
+and the operator ⊕  refers to bit-wise XOR of the operands.  
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+69 
+
+Eq. 90 
+
+Ki = GFILOG(i). 
+
+Eq. 91 
+
+Eq. 92 
+
+Eq. 93 
+
+ 
+
+Eq. 94 
+
+Parity_Byte Q (b,k,q,j) = ∑
+
+i
+
+=
+
+0
+
+Ni
+≠−=
+
+,
+qipi
+
+,1
+
+≠
+
+ Ki  ⊗  extent_block_byte (b,k,i,j) 
+
+The operators ∑ and ⊗  refer to Galois field addition and Galois field multiplication respectively.  The 
+value for constant Ki is arrived as: 
+
+b
+
+<
+
+Block_Size
+
+Parity Q (k,q,j) =  ∀
+
+b
+
+=
+
+0
+
+Parity_Byte Q (b,k,q,j) 
+
+ Notes:  
+
+1.  The notation  ∀ implies that Parity Q (k,q,j) is a sequential enumeration of the Parity_Byte Q 
+
+(b,k,q,j), where b ranges from 0 to the Block_Size - 1.   
+
+2.  Function extent_block_byte (b,k,i,j) returns the bth byte of an extent_block (k,i,j).   
+
+4.2.23.1 
+
+Parity Re-computation on Block Update 
+
+If a data block is updated at byte index b of an extent u, the equations for P and Q parity re-computation 
+MUST be as follows:  
+
+Parity Pnew = extent_block_byte(b,k,p,j)   ⊕  old_extent_block_byte(b,k,u,j) ⊕  
+new_extent_block_byte(b,k,u,j) 
+
+Parity Qnew  = extent_block_byte(b,k,q,j)  ⊕ Ku  ⊗  old_extent_block_byte(b,k,u,j) ⊕ Ku  ⊗  
+new_extent_block_byte(b,k,u,j)  
+
+Where Ku = GFILOG(u) and  ⊗ refers to Galois multiplication operation. Pnew  and Qnew MUST be re-
+computed for every byte index b updated in the extent u. 
+
+4.2.23.2 
+
+Galois Field Operations 
+
+The Galois field operations that MUST be used to calculate Parity Q for the RAID 6 algorithm described in 
+Section 4.2.23 are the same as the Galois field operations described in 4.2.22.2. 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+70 
+
+4.2.24 RAID 6 Rotating Parity N with Data Continuation (PRL=06, RLQ=03) 
+
+Figure 25 gives an example of an implementation of RAID-6 called Rotating Parity N with Data 
+Continuation. The indices and constants provided in Table 11 are valid for this type of RAID. 
+
+Virtual Disk
+
+ Data Block 0
+
+ Data Block 1
+
+ Data Block 2
+
+ Data Block 3
+
+ Data Block 4
+
+ Data Block 5
+
+ Data Block 6
+
+ Data Block 7
+
+ Data Block 8
+
+ Data Block 9
+
+ Data Block 10
+
+ Data Block 11
+
+ Data Block 12
+ Data Block 13
+
+ Data Block 14
+
+ Data Block 15
+
+Stripe 0
+
+Depth
+
+Stripe 1
+
+Depth
+
+Stripe 2
+
+Depth
+
+Extent 0
+
+Strip (0,0)
+ Data Block 0
+
+ Data Block 1
+
+ Data Block 2
+
+ Data Block 3
+
+Strip (0,1)
+ Data Block 16
+
+ Data Block 17
+
+ Data Block 18
+
+ Data Block 19
+
+Strip (0,2)
+ Data Block 32
+
+ Data Block 33
+
+ Data Block 34
+
+ Data Block 35
+
+Extent 1
+
+Strip (1,0)
+
+ Data Block 4
+
+ Data Block 5
+ Data Block 6
+
+ Data Block 7
+
+Strip (1,1)
+
+ Data Block 20
+
+ Data Block 21
+
+ Data Block 22
+
+ Data Block 23
+
+Strip (1,2)
+Parity P (0,1,2)
+Parity P (1,1,2)
+
+Parity P (2,1,2)
+
+Parity P (3,1,2)
+
+Extent 2
+
+Extent 3
+
+Extent 4
+
+Extent Stripe Length
+
+Strip (2,0)
+
+ Data Block 8
+
+ Data Block 9
+ Data Block 10
+
+ Data Block 11
+
+Strip (2,1)
+Parity P (0,2,1)
+Parity p (1,2,1)
+
+Parity P (2,2,1)
+
+Parity P (3,2,1)
+
+Strip (2,2)
+Parity Q (0,2,2)
+
+Parity Q (1,2,2)
+
+Parity Q (2,2,2)
+
+Parity Q (3,2,2)
+
+Strip (3,0)
+Parity P (0,3,0)
+Parity P (1,3,0)
+
+Parity P (2,3,0)
+
+Parity P (3,3,0)
+
+Strip (3,1)
+Parity Q (0,3,1)
+
+Parity Q (1,3,1)
+
+Parity Q (2,3,1)
+
+Parity Q (3,3,1)
+
+Strip (3,2)
+ Data Block 24
+
+ Data Block 25
+
+ Data Block 26
+
+ Data Block 27
+
+Strip (4,0)
+
+Parity Q (0,4,0)
+
+Parity Q (1,4,0)
+
+Parity Q (2,4,0)
+
+Parity Q (3,4,0)
+
+Strip (4,1)
+ Data Block 12
+
+ Data Block 13
+
+ Data Block 14
+
+ Data Block 15
+
+Strip (4,2)
+ Data Block 28
+
+ Data Block 29
+
+ Data Block 30
+
+ Data Block 31
+
+Figure 25: RAID-6 Rotating Parity N with Data Continuation (PRL=06, RLQ=03) Example 
+
+ 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+ 
+
+71 
+
+Eq. 95 
+
+Eq. 96 
+
+Eq. 98 
+
+Eq. 99 
+
+Eq. 100 
+
+N
+
+−
+
+,1
+
+,
+qipi
+≠
+
+≠
+
+Eq. 101 
+
+The stripe j on which a virtual block x resides MUST adhere to the following formula: 
+
+The extent p on which the parity P for a given stripe j resides must adhere to the following formula: 
+
+j = FLOOR(FLOOR(x/L)/(N-2)) 
+
+p= (N-1) - (MOD (FLOOR ((FLOOR(x/L)) / (N-2) + 1), N)) 
+
+The extent q on which the parity Q for a given stripe j resides must adhere to the following formula: 
+
+Eq. 97 
+
+q = MOD (1+p, N) 
+
+The extent i on which a given virtual block x resides MUST adhere to the following formula: 
+
+i = MOD(MOD(FLOOR(x/L),N-2)+p+1,N). 
+
+The allocation of data blocks in a RAID-6 Rotating Parity N with Data Restart VD MUST adhere to the 
+following formula: 
+
+virtual_block(x) = extent_block(MOD(x,L), i, j). 
+
+The values of the parity P and Q MUST be computed according to the following formula: 
+
+Parity P (k,p,j) =   ⊕
+
+i
+
+=
+
+0
+
+ extent_block (k,i,j) 
+
+and the operator ⊕  refers to bit-wise XOR of the operands.  
+
+Parity_Byte Q (b,k,q,j) = ∑
+
+i
+
+=
+
+0
+
+Ni
+≠−=
+
+,
+qipi
+
+,1
+
+≠
+
+ Ki  ⊗  extent_block_byte (b,k,i,j) 
+
+The operators ∑ and ⊗  refer to Galois field addition and Galois field multiplication respectively.  The 
+value for constant Ki is arrived as: 
+
+Eq. 102 
+
+Ki = GFILOG(i). 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+72 
+
+Eq. 103 
+
+b
+
+<
+
+Block_Size
+
+Parity Q (k,q,j) =  ∀
+
+b
+
+=
+
+0
+
+Parity_Byte Q (b,k,q,j) 
+
+Notes:  
+
+1.  The notation  ∀ implies that Parity Q (k,q,j) is a sequential enumeration of the Parity_Byte Q 
+
+(b,k,q,j), where b ranges from 0 to the Block_Size - 1.   
+
+2.  Function extent_block_byte (b,k,i,j) returns the bth byte of an extent_block (k,i,j).   
+
+4.2.24.1 
+
+Parity Re-computation on Block Update 
+
+If a data block is updated at byte index b of an extent u, the equations for P and Q parity re-computation 
+MUST be as follows:  
+
+Parity Pnew = extent_block_byte(b,k,p,j)   ⊕  old_extent_block_byte(b,k,u,j)  ⊕  
+new_extent_block_byte(b,k,u,j) 
+
+Eq. 104 
+
+ 
+
+Eq. 105 
+
+Parity Qnew  = extent_block_byte(b,k,q,j)  ⊕ Ku  ⊗  old_extent_block_byte(b,k,u,j) ⊕ Ku  ⊗  
+new_extent_block_byte(b,k,u,j)  
+
+Where Ku = GFILOG(u) and  ⊗ refers to Galois multiplication operation. Pnew  and Qnew MUST be re-
+computed for every byte index b updated in the extent u. 
+
+4.2.24.2 
+
+Galois Field Operations 
+
+The Galois field operations that MUST be used to calculate Parity Q for the RAID 6 algorithm described in 
+Section 4.2.24 are the same as the Galois field operations described in 4.2.22.2. 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+73 
+
+4.2.25 Multi Disk Failure RAID Rotating Parity 0 with Data Restart (PRL=07, RLQ=00) 
+
+Figure 26 gives an example of Multi Disk Failure (MDF) RAID Rotating Parity 0 with Data Restart. This 
+example supports two simultaneous disk failures. 
+
+Figure 26: MDF RAID Rotating Parity 0 with Data Restart (PRL=07, RLQ=00) Example 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+ 
+
+74 
+
+Table 14 defines the constants and indices that are required to describe the Multi Disk Failure (MDF) 
+RAID data layout and parity computation.  
+
+Table 14: Indices and Constants for Multi Disk Failure RAID 
+
+Variable or Index 
+
+Description 
+
+Minimum Value 
+
+Maximum Value 
+
+Size of a strip in blocks. 
+
+N/A (a fixed value) 
+
+N/A (a fixed value) 
+
+N/A (a fixed value) 
+
+N/A (a fixed value) 
+
+N/A (a fixed value) 
+
+N/A (maximum of 255) 
+
+i 
+
+j 
+
+k 
+
+L 
+
+M 
+
+N 
+
+b 
+
+F 
+
+f 
+
+Qf 
+
+qf  
+
+R 
+
+Index of an extent of a  
+VD. 
+
+Index of a stripe in a 
+VD. 
+
+Offset of a block from 
+the beginning of a strip. 
+
+Number of data blocks 
+in a VD. M MUST be 
+evenly divisible by (N-
+F)*L*R.  
+
+Number of extents in a 
+VD. 
+
+Index of a byte in an 
+extent block. 
+
+Maximum number of 
+simultaneous disk 
+failures tolerated. 
+
+Index to the Parity Qf. 
+
+Relative index within the 
+Parity extents.  
+
+Index of the extent on 
+which fth parity Qf for a 
+given stripe resides. 
+
+Number of stripes 
+before rotating Parity 
+(where R=2^n and n is a 
+positive integer). 
+
+0 
+
+0 
+
+0 
+
+0 
+
+2 
+
+0 
+
+0 
+
+1 
+
+The fth Parity Block.   
+
+N/A 
+
+FLOOR(FLOOR((M-
+1)/L)/(N-F)) 
+
+N-1 
+
+L-1 
+
+Block_Size - 1. 
+
+127 
+
+F-1 
+
+N/A 
+
+N+F-1 
+
+0x80000000 
+
+ 
+
+The stripe j on which a virtual block x resides MUST adhere to the following formula: 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+75 
+
+Eq. 106 
+
+Eq. 107  
+
+Eq. 108 
+
+Eq. 110 
+
+Eq. 111 
+
+The extent qf on which the fth parity Qf for a given stripe j resides MUST adhere to the following formulas:  
+
+j = FLOOR(FLOOR(x/L)/(N-F)) 
+
+The extent i on which a given virtual block x resides MUST adhere to the following formula: 
+
+q0 = MOD (FLOOR(FLOOR(x/(L*R))/(N-F)),N), when f=0;  
+
+For  (f=1; f ≤ F-1; f++) { 
+
+qf = MOD (q(f-1)+1, N) 
+
+} 
+
+Eq. 109 
+
+IF MOD (FLOOR (x/(L*R)), N-F) < q0  
+ 
+THEN { 
+
+ i = MOD (FLOOR (x/(L*R)), N-F) 
+IF q0+F > N 
+THEN   i = i + MOD (q0+F, N) 
+
+     
+
+}   
+ 
+ELSE 
+     
+
+i =  MOD (FLOOR (x/(L*R)), N-F) + F   
+
+ 
+
+ 
+
+The allocation of data blocks in a MDF RAID Rotating Parity 0 with Data Restart VD MUST adhere to the 
+following formula: 
+
+virtual_block (x) = extent_block (MOD(x, L), i, j)  
+
+4.2.25.1 
+
+Galois Field Generation  
+
+The Galois field elements are used as the basis in the computation of parity bytes Qf, and are dependent 
+on the Generator Polynomial. The Galois field elements MUST be generated using the following 
+algorithm. 
+
+int GenerateGaloisField (int nFieldSize, unsigned int lPolynomial) 
+{ 
+   unsigned int         b, index, gf_elements=1; 
+   unsigned short * GFLOG, * GFILOG; 
+ 
+   gf_elements <<= 256; // nFieldSize; 
+   
+   GFLOG  = (unsigned short *) malloc (sizeof (unsigned short) * gf_elements); 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+76 
+
+ GFLOG[index]=GFILOG[index]=0x00; 
+
+   GFILOG = (unsigned short *) malloc (sizeof (unsigned short) * gf_elements); 
+ 
+   // Initialize the Galois Field and Galois-Log-Field Arrays respectively. 
+   for (index=0; index <= gf_elements-1;index++) 
+ 
+   b = 1; 
+   for (index = 0; index <= gf_elements-1; index++)   { 
+        GFILOG[index] = (unsigned char) b;          // Galois Field Element. 
+        GFLOG[b] = (unsigned char) index;           // Log of Galois Field Element. 
+        b ^= ((b<<=1) & gf_elements) ? lPolynomial : 0; 
+   } 
+  return 0; 
+} 
+
+The value of the generator polynomial, lPolynomial, MUST be one of the polynomials defined in the MDF 
+Parity Generator Polynomial field of the Virtual Disk Configuration record (see 5.9.1).  
+
+4.2.25.2 
+
+Constant Matrix Generation  
+
+This section describes the generation of the Constant Matrix according to the Vandermonde Matrix 
+Method1,2. The elements of the Constant Matrix shall be used in the generation of Qf parities and its use is 
+described in 4.2.25.3. 
+
+Step 0:  
+
+Create the Vandermonde matrix (Figure 27) with the following properties: 
+
+•  Any element in the Matrix (i, j) MUST be equal to ij 
+
+•  Number of rows MUST be equal to N+F 
+
+•  Number of columns MUST be equal to N 
+
+0
+
+0
+0
+1
+
+0
+
+2
+
+..
+
+..
+
+⎛
+⎜
+⎜
+⎜
+⎜
+⎜
+⎜
+⎜
+⎜
+⎜
+⎜
+⎜
+⎝
+
+1
+
+0
+1
+1
+
+1
+
+2
+
+..
+
+..
+
+(
+
+N
+
+0
+
+)1
+−
+0
+N
+
+(
+
+N
+
+1
+
+)1
+−
+1
+N
+
+(
+
+N
+
+2
+
+)1
+−
+2
+N
+
+..
+
+..
+
+..
+
+..
+
+..
+
+..
+
+..
+
+..
+
+..
+
+..
+
+..
+
+..
+
+..
+
+..
+
+..
+
+..
+
+..
+
+..
+
+..
+
+..
+
+..
+
+..
+
+..
+
+..
+
+(
+
+N
+
+)1
+−
+
+N
+
+)1
+−
+
+(
+
+N
+
+)1
+−
+
+0
+(
+1
+
+2
+
+(
+
+N
+
+)1
+−
+
+(
+
+N
+
+)1
+−
+N
+)1
+(
+−
+N
+
+..
+
+..
+
+ 
+
+⎞
+⎟
+⎟
+⎟
+⎟
+⎟
+⎟
+⎟
+⎟
+⎟
+⎟
+⎟
+⎠
+
+(
+
+FN
++
+
+−
+
+)1
+
+0
+
+(
+
+FN
++
+
+−
+
+)1
+
+1
+
+(
+
+FN
++
+
+−
+
+)1
+
+0
+
+(
+
+FN
++
+
+−
+
+)1
+
+(
+
+N
+
+)1
+−
+
+Figure 27 Vandermonde Matrix 
+
+2
+
+0
+2
+1
+
+2
+
+2
+
+..
+
+..
+
+ 
+
+                                            
+1 James S. Plank, “A Tutorial on Reed-Solomon Coding for Fault-Tolerance in RAID-like Systems,” 
+Software – Practice & Experience, Volume 27, Issue 9, September, 1997 pp. 995-1012. 
+2 James S. Plank, Ying Ding, “Note: Correction to the 1997 Tutorial on Reed-Solomon Coding,” Software: 
+Practice & Experience, Volume 35, Issue 2, February 2005, pp. 189-194. 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+77 
+
+Step 1:  
+
+112.  
+
+Compute the Galois Field Values,
+
+, for each element (i,j) in the above Vandermonde matrix using Eq. 
+
+jiv
+),(
+
+Where GFILOG() and GFLOG() are defined in Eq. 111. The resulting Galois Field Element Matrix is 
+shown in Figure 28. 
+
+Eq. 112 
+
+v
+
+),(
+ji
+
+(
+j
+)1
+−⊗=
+
+(
+0
+
+)i
+
+ 
+
+v
+
+ji
+),(
+
+=
+
+(
+GFILOG
+
+(
+
+MOD
+
+(
+
+)1
+(
+j
+−+
+0
+
+GFLOG
+
+(
+
+i
+
+0),
+
+xFF
+
+)))
+
+  
+
+1
+
+v
+
+v
+
+)0,1(
+
+)0,2(
+..
+
+v
+
+(
+v
+
+(
+
+)0,
+N
+..
+
+⎛
+⎜
+⎜
+⎜
+⎜
+⎜
+⎜
+⎜
+⎜
+⎜
+⎜
+⎜
+⎝
+
+0
+
+v
+
+v
+
+)1,1(
+
+)1,2(
+..
+
+v
+
+(
+v
+
+(
+
+)1,
+
+N
+..
+
+0
+
+v
+
+v
+
+)2,1(
+
+)2,2(
+..
+
+v
+
+(
+v
+
+(
+
+)2,
+N
+..
+
+..
+
+..
+
+..
+
+..
+
+..
+
+..
+..
+
+..
+
+..
+
+..
+
+..
+
+..
+
+..
+
+..
+..
+
+..
+
+..
+
+..
+
+..
+
+..
+
+..
+
+..
+..
+
+..
+
+0
+
+v
+
+v
+
+,1(
+
+N
+
+)1
+−
+
+)1
+−
+
+,2(
+N
+..
+
+v
+
+(
+v
+
+(
+
+N
+
+,1
+−
+
+N
+
+)1
+−
+
+)1
+−
+
+,
+NN
+..
+
+v
+
+(
+
+FN
+
++−
+
+,1
+
+N
+
+)1
+−
+
+ 
+
+⎞
+⎟
+⎟
+⎟
+⎟
+⎟
+⎟
+⎟
+⎟
+⎟
+⎟
+⎟
+⎠
+
+v
+
+(
+
+FN
+
++−
+
+)0,1
+
+(
+
+FN
+
++−
+
+)1,1
+
+(
+
+FN
+
++−
+
+)2,1
+
+v
+
+v
+
+N
+
+)0,1
+−
+
+N
+
+)1,1
+−
+
+N
+
+)2,1
+−
+
+Figure 28: Galois Field Element Matrix 
+
+Step 2: 
+
+Transform the rows 0 to (N-1) of the Galois Field Element Matrix (Figure 28) to an Identity Matrix through 
+a series of the following column operations: 
+
+•  Any column Ci may be swapped with column Cj 
+
+•  Any column Ci may be replaced with   Ci * c, where c ≠ 0 
+
+•  Any column Ci may be replaced with Ci = Ci + c*Cj , where i ≠ j and c ≠ 0. 
+
+The resulting Identity Matrix is referred to as the Parity Generator Constant Matrix (Figure 29). 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+78 
+
+1
+
+0
+
+0
+
+..
+
+0
+
+⎛
+⎜
+⎜
+⎜
+⎜
+⎜
+⎜
+⎜
+⎜
+⎜
+⎜
+⎜
+⎝
+
+0
+
+1
+
+0
+
+..
+
+0
+
+0
+
+0
+
+1
+
+..
+
+0
+
+..
+
+..
+
+..
+
+..
+
+..
+
+..
+..
+
+..
+
+..
+
+..
+
+..
+
+..
+
+..
+
+..
+..
+
+..
+
+..
+
+..
+
+..
+
+..
+
+..
+
+..
+..
+
+..
+
+0
+
+0
+
+0
+
+..
+
+1
+
+ 
+
+⎞
+⎟
+⎟
+⎟
+⎟
+⎟
+⎟
+⎟
+⎟
+⎟
+⎟
+⎟
+⎠
+
+0,
+
+K
+N
+..
+
+1,
+
+K
+N
+..
+
+2,
+
+K
+N
+..
+
+K
+
+FN
+
+−+
+
+0,1
+
+FN
+
+−+
+
+1,1
+
+FN
+
+−+
+
+2,1
+
+K
+
+K
+
+K
+
+−
+
+)1
+
+NN
+(,
+..
+
+K
+
+FN
+
+−+
+
+(,1
+
+N
+
+−
+
+)1
+
+Figure 29: Parity Generator Constant Matrix 
+
+ 
+
+Notes:  
+
+4.2.25.3 
+
+Galois Parity Computation  
+
+The value of Parity Qf , where 0 ≤ f ≤ (F-1), is computed according to the following formula:   
+
+Parity_Byte Qf (b,k,f,j) = ∑
+
+FNi
+−+=
+
+,1
+
+qiqi
+,
+≠
+0
+1
+
+≠
+
+.....
+
+qi
+≠
+
+(
+
+F
+
+)1
+−
+
+i
+
+=
+
+,0
+
+qiqi
+,
+≠
+0
+1
+
+≠
+
+.....
+
+qi
+≠
+
+(
+
+F
+
+)1
+−
+
+K(N+f,i)  ⊗  extent_block_byte (b,k,i,j) 
+
+The operators ∑ and ⊗  refers to Galois field addition and Galois field multiplication respectively.   
+
+b
+
+<
+
+Block_Size
+
+Parity Qf (k,f,j) =  ∀
+
+b
+
+=
+
+0
+
+Parity_Byte Qf (b,k,q,j) 
+
+Eq. 113 
+
+Eq. 114 
+
+ 
+
+1.  The notation  ∀  implies that Parity Qf (k,f,j) is a sequential enumeration of the Parity_Byte Qf 
+
+(b,k,f,j), where b ranges from 0 to the Block_Size-1. 
+
+2.  Function extent_block_byte (b,k,i,j) returns the bth byte of an extent_block (k,i,j). 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+79 
+
+4.2.26 Multi Disk Failure RAID Rotating Party N with Data Restart (PRL=07, RLQ=02) 
+
+Figure 30 gives an example of Multi Disk Failure (MDF) RAID Rotating Parity N with Data Restart. This 
+example supports two simultaneous disk failures. The indices and constants provided in Table 14 are 
+valid for this type of RAID. 
+
+Figure 30: MDF RAID Rotating Parity N with Data Restart (PRL=07, RLQ=02) Example 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+ 
+
+80 
+
+The stripe j on which a virtual block x resides MUST adhere to the following formula: 
+
+The extent pf  on which the fth parity Qf for a given stripe j resides MUST adhere to the following formulas:  
+
+j = FLOOR(FLOOR(x/L)/(N-F)) 
+
+q0 = (N-1) - (MOD (FLOOR ((FLOOR(x/(L*R))) / (N-F) + (F-1)), N)), when f=0; 
+
+The extent i on which a given virtual block x resides MUST adhere to the following formula: 
+
+Eq. 115 
+
+Eq. 116  
+
+Eq. 117 
+
+Eq. 118 
+
+For  (f=1; f ≤ F-1; f++) { 
+
+qf = MOD (q(f-1)+f, N) 
+
+} 
+
+IF MOD (FLOOR (x/(L*R)), N-F) < q0  
+ 
+THEN { 
+
+ i = MOD (FLOOR (x/(L*R)), N-F) 
+IF q0+F > N 
+THEN   i = i + MOD (q0+F, N) 
+
+     
+
+}   
+ 
+ELSE 
+     
+
+The allocation of data blocks in a MDF RAID Rotating Parity N with Data Restart VD MUST adhere to the 
+following formula:  
+
+i =  MOD (FLOOR (x/(L*R)), N-F) + F   
+
+Eq. 119 
+
+virtual_block (x) = extent_block (MOD(x, L), i, j)  
+
+The value of Parity Qf  is calculated as described in Sections 4.2.25.1, 4.2.25.2, and 4.2.25.3. 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+81 
+
+4.2.27 Multi Disk Failure RAID Rotating Party N with Data Continuation (PRL=07, 
+
+RLQ=03) 
+
+Figure 31 gives an example of Multi Disk Failure (MDF) RAID Rotating Parity N with Data continuation. 
+This example supports two simultaneous disk failures. The indices and constants provided in Table 14 
+are valid for this type of RAID. 
+
+Virtual Disk
+
+Data Block 0
+
+Data Block 1
+
+Data Block 2
+
+Data Block 3
+
+Data Block 4
+
+Data Block 5
+
+Data Block 6
+
+Data Block 7
+
+Data Block 8
+
+Data Block 9
+Data Block 10
+
+Data Block 11
+
+Data Block 12
+
+Data Block 13
+Data Block 14
+
+Data Block 15
+
+n
+o
+
+ 
+
+i
+t
+c
+n
+u
+F
+g
+n
+p
+p
+a
+M
+
+i
+
+Strip (2,0)
+Data Block 8
+
+Data Block 9
+
+Data Block 10
+Data Block 11
+
+Strip (2,1)
+Parity Q0(0,2,1)
+Parity Q0(1,2,1)
+Parity Q0(2,2,1)
+Parity Q0(3,2,1)
+
+Strip (2,2)
+Parity Q1(0,2,2)
+Parity Q1(1,2,2)
+Parity Q1(2,2,2)
+Parity Q1(3,2,2)
+
+Extent Stripe Length
+
+Stripe 0
+
+Depth
+
+Stripe 1
+
+Depth
+
+Stripe 2
+
+Depth
+
+Extent 0
+
+Strip (0,0)
+Data Block 0
+
+Data Block 1
+
+Data Block 2
+
+Data Block 3
+
+Strip (0,1)
+Data Block 16
+
+Data Block 17
+
+Data Block 18
+Data Block 19
+
+Strip (0,2)
+Data Block 32
+
+Data Block 33
+
+Data Block 34
+
+Data Block 35
+
+Extent 1
+
+Strip (1,0)
+Data Block 4
+
+Data Block 5
+
+Data Block 6
+Data Block 7
+
+Strip (1,1)
+Data Block 20
+
+Data Block 21
+
+Data Block 22
+Data Block 23
+
+Strip (1,2)
+Parity Q0(0,1,2)
+Parity Q0(1,1,2)
+Parity Q0(2,1,2)
+Parity Q0(3,1,2)
+
+Extent 2
+
+Extent 3
+
+Extent 4
+
+Strip (3,0)
+Parity Q0(0,3,0)
+Parity Q0(1,3,0)
+Parity Q0(2,3,0)
+Parity Q0(3,3,0)
+
+Strip (3,1)
+Parity Q1(0,3,1)
+Parity Q1(1,3,1)
+Parity Q1(2,3,1)
+Parity Q1(3,3,1)
+
+Strip (3,2)
+Data Block 24
+
+Data Block 25
+
+Data Block 26
+
+Data Block 27
+
+Strip (4,0)
+
+Parity Q1(0,4,0)
+Parity Q1(1,4,0)
+Parity Q1(2,4,0)
+Parity Q1(3,4,0)
+
+Strip (4,1)
+
+Data Block 12
+
+Data Block 13
+
+Data Block 14
+Data Block 15
+
+Strip (4,2)
+Data Block 28
+
+Data Block 29
+
+Data Block 30
+
+Data Block 31
+
+Figure 31: MDF RAID Rotating Parity N with Data Continuation (PRL=07, RLQ=03) Example 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+ 
+
+82 
+
+The stripe j on which a virtual block x resides MUST adhere to the following formula: 
+
+The extent qf on which the fth parity Qf for a given stripe j resides MUST adhere to the following formulas: 
+
+j = FLOOR(FLOOR(x/L)/(N-F)) 
+
+q0 = (N-1) - (MOD (FLOOR ((FLOOR(x/(L*R))) / (N-F) + (F-1)), N)), when f=0;  
+
+For  (f=1; f ≤  F-1; f++) { 
+
+qf = MOD (q(f-1)+f, N) 
+
+} 
+
+The extent i on which a given virtual block x resides MUST adhere to the following formula: 
+
+i = MOD(MOD(FLOOR(x/(L*R)),N-F)+q0+F,N). 
+
+The allocation of data blocks in a MDF RAID Rotating Parity N with Data Continuation VD MUST adhere 
+to the following formula: 
+
+virtual_block(x) = extent_block(MOD(x,L), i, j). 
+
+The value of Parity Qf  is calculated as described in Sections 4.2.25.1, 4.2.25.2, and 4.2.25.3. 
+
+Eq. 120 
+
+Eq. 121  
+
+Eq. 122 
+
+Eq. 123 
+
+Eq. 124 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+83 
+
+4.3  Secondary RAID Level 
+
+Table 15 lists values used in the Secondary_RAID_Level field of the Virtual Disk Configuration Record 
+(Section 5.9.1) and their definitions. The table defines secondary RAID levels such as Striped, Volume 
+Concatenation, Spanned, and Mirrored for hybrid or multilevel virtual disks.  The Secondary_RAID_Level 
+field in the Virtual Disk Configuration Record MUST use the values defined in Table 15. 
+
+Table 15: Secondary RAID Levels 
+
+Name 
+
+Striped 
+
+SRL 
+Byte 
+
+0x00 
+
+Description 
+
+Mirrored 
+Concatenated 
+Spanned 
+
+0x01 
+0x02 
+0x03 
+
+Data is striped across Basic VDs. First strip stored on first BVD and 
+next on next BVD.  
+NOTE: BVD sequence is determined by the Secondary_Element_Seq 
+field in the Virtual Disk Configuration Record (Section 5.9.1). 
+Data is mirrored across Basic VDs.  
+Basic VDs combined head to tail. 
+A combination of stripping and concatenations involving Basic VDs of 
+different sizes. 
+NOTE: BVD sequence is determined by the Secondary_Element_Seq 
+field in the Virtual Disk Configuration Record (Section 5.9.1). 
+
+ 
+
+ 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+84 
+
+4.3.1  Striped Secondary RAID Level (SRL=00) 
+
+In a VD with a Striped Secondary RAID Level, the data MUST be striped across basic virtual disks. The 
+BVDs MUST have an equal number of user addressable data strips. The BVDs are not required to have 
+the same Primary RAID Level (Section 4.1), RAID Level Qualifier (Section 4.2), or capacity. Table 16 
+gives the indices and constants used in the description of a Striped Secondary RAID Level (Striped SRL) 
+VD. 
+
+Table 16: Indices and Constants for Striped Secondary RAID Level 
+
+Variable or Index 
+
+Description 
+
+Minimum Value 
+
+Maximum Value 
+
+i 
+
+j 
+q 
+
+Li 
+
+M 
+
+N 
+
+J 
+S 
+
+x 
+
+Index of a BVD of in a 
+striped VD 
+Index of a stripe in a VD 
+Offset of a data block 
+from the beginning of a 
+stripe 
+Size of a strip in blocks 
+on BVD i  
+
+Number of blocks in a 
+VD 
+Number of BVDs in a 
+striped VD 
+Number of stripes 
+Size of a stripe in a 
+striped VD 
+
+Offset of a data block 
+from the beginning of a 
+VD 
+
+0 
+
+0 
+0 
+
+N-1 
+
+J-1 
+S-1 
+
+Equal to the stripe depth 
+of BVD i’s Primary RAID 
+Level 
+N/A (a fixed value) 
+
+Equal to the stripe depth 
+of a BVD i’s Primary 
+RAID Level 
+N/A (a fixed value) 
+
+N/A (a fixed value) 
+
+N/A (a fixed value) 
+
+S
+
+=
+
+iL
+
+ 
+
+M/S 
+N
+1
+−
+
+∑
+
+i
+0
+=
+0 
+
+S
+
+=
+
+∑
+
+iL
+
+ 
+
+M/S 
+N
+1
+−
+
+i
+0
+=
+M-1 
+
+ 
+
+The Striped Secondary RAID level introduces the concept of a stripe_block. Since BVDs in a Striped SRL 
+VD can have different strip sizes, it is more economical to represent a block’s offset from the beginning of 
+a stripe rather than from the beginning of a strip on a specific BVD. A stripe_block uses the indices q and 
+j to identify its position (i.e., stripe_block(q,j)) 
+
+The size of a stripe on a Striped SRL VD MUST adhere to the following formula: 
+
+Eq. 125 
+
+S
+
+=
+
+iL
+
+ 
+
+N
+
+1
+−
+
+∑
+
+i
+
+=
+
+0
+
+Eq. 126 
+
+The number of stripes J is equal to M/S. The user addressable data MUST be distributed according to the 
+following formula: 
+
+virtual_block(x) = stripe_block(MOD(x, S), FLOOR(x, S)) 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+85 
+
+Figure 32 gives an example of a VD with a Striped Secondary RAID Level. In this example L0 = 4, L1 = 2, 
+L2 = 3, L3 = 4, and L4 = 3. Thus, S = 16. 
+
+Figure 32:  Striped Secondary RAID Level (SRL=00) 
+
+ 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+86 
+
+4.3.2  Mirrored Secondary RAID Level (SRL=01) 
+
+In a VD with a Mirrored Secondary RAID Level, the data MUST be mirrored across basic virtual disks. 
+Figure 33 gives an example of a VD with a Mirrored Secondary RAID Level. Each data block of the virtual 
+disk (virtual_block(x)) MUST be stored at the same user addressable data offset in each BVD. 
+
+ 
+
+Figure 33:  Mirrored Secondary RAID Level (SRL=01) 
+
+ 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+87 
+
+4.3.3  Concatenated Secondary RAID Level (SLR=02) 
+
+In a VD with a Concatenated Secondary RAID Level, the user addressable data space is created by 
+combining the user addressable data spaces of the BVDs making up the VD. The BVDs act as extents for 
+the VD and are called BVD extents. The BVDs are combined in a head to tail fashion. The BVDs are not 
+required to have the same addressable data space. 
+
+Figure 34 gives an example of a Concatenated VD with three BVD extents. Table 17 gives the indices 
+and constants used in the formulas below  
+
+To represent a specific block in a specific BVD the following notation is used: 
+
+The allocation of data MUST adhere to the following equations. 
+
+bvd_extent_block (y, i). 
+
+Eq. 127 
+
+IF x = 0 
+
+ELSE IF x = M-1 
+
+THEN virtual_block (0) = bvd_extent_block (0, 0) 
+
+THEN virtual_block (x) = bvd_extent_block (CN-1-1, N-1) 
+
+ELSE IF virtual_block (x-1) = bvd_extent_block (Ci-1, i) 
+
+THEN virtual_block (x) = bvd_extent_block (0, i+1) 
+
+ELSE IF virtual_block (x-1) = bvd_extent_block (y-1, i) 
+
+THEN virtual_block (x) = bvd_extent_block (y, i) 
+
+Table 17:  Indices and Constants for Concatenated Secondary RAID Level VDs 
+
+Variable or Index 
+
+Description 
+
+Minimum Value 
+
+Maximum Value 
+
+i 
+
+M 
+
+N 
+
+Ci 
+
+x 
+
+y 
+
+Index of a BVD extent of 
+a VD 
+Number of data blocks 
+in a VD 
+Number of BVDs acting 
+as extents in a VD with 
+a Concatenated 
+Secondary RAID Level 
+Number of data blocks 
+in BVD i 
+Offset of a data block 
+from the beginning of 
+the VD 
+Offset of a data block 
+from the beginning of a 
+BVD extent 
+
+0 
+
+0 
+
+0 
+
+N/A (a fixed value) 
+
+N/A (a fixed value) 
+
+N/A (a fixed value) 
+
+N/A (a fixed value) 
+
+N/A (a fixed value) 
+
+N/A (a fixed value) 
+
+N-1 
+
+M-1 
+
+M-1 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+88 
+
+Figure 34:  Concatenated Secondary RAID Level (SRL=02) 
+
+ 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+89 
+
+4.3.4  Spanned Secondary RAID Level (SRL=03) 
+
+In VD with a Spanned Secondary RAID Level, the user addressable data space is created by a 
+combination of stripping and concatenation of the user addressable data spaces of the BVDs making up 
+the VD. The BVDs can be in any order. They can have different capacities, different RAID levels and 
+different strip sizes. Unlike the Striped Secondary RAID Level, the BVDs do not have to have the same 
+number of user addressable data strips. Table 18 gives the indices and constants used in the description 
+of a Spanned Secondary RAID Level (Spanned SRL) VD. 
+
+The size of stripe j MUST be determined using the following formula: 
+
+Eq. Sj =  ∑
+
+N
+
+1
+−
+
+i
+
+=
+
+0
+
+{IF Ji ≥ j THEN Li ELSE 0 }. 
+
+The total number of user addressable data blocks included in stripes 0 through j is: 
+
+Eq. 128 
+
+j
+
+Tj = ∑
+
+v 0
+=
+
+Sv 
+
+Eq. 129 
+
+The Spanned SRL VD is also described using the stripe_block(q, j) concept (Section 4.3.1). The user 
+addressable data in a Spanned SRL VD MUST be distributed according to the following formula. 
+
+virtual_block(x) = stripe_block(x – Tu, u + 1), 
+
+where Tu is the largest value of Tj less than or equal to x. 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+90 
+
+Table 18: Indices and Constants for Spanned Secondary RAID Level 
+
+Variable or Index 
+
+Description 
+
+Minimum Value 
+
+Maximum Value 
+
+i 
+
+j 
+q 
+
+Li 
+
+M 
+
+N 
+
+Ji 
+
+Sj 
+
+Tj 
+
+x 
+
+Index of a BVD of in a 
+spanned VD 
+Index of a stripe in a VD 
+Offset of a data block 
+from the beginning of a 
+stripe 
+Size of a strip in blocks 
+on BVD i  
+
+Number of blocks in a 
+VD 
+Number of BVDs in a 
+striped VD 
+Number of stripes in on 
+BVD i 
+
+Size of a stripe j on a 
+Spanned VD 
+
+Number of blocks in 
+stripes 0 through j 
+
+Offset of a data block 
+from the beginning of a 
+VD 
+
+0 
+
+0 
+0 
+
+N-1 
+
+J-1 
+S-1 
+
+Equal to the stripe depth 
+of BVD i’s Primary RAID 
+Level 
+N/A (a fixed value) 
+
+Equal to the stripe depth 
+of a BVD i’s Primary 
+RAID Level 
+N/A (a fixed value) 
+
+N/A (a fixed value) 
+
+N/A (a fixed value) 
+
+N/A (a fixed value 
+determined by BVD i’s 
+Primary RAID Level 
+parameters) 
+
+N/A (a fixed value 
+determined by BVD i’s 
+Primary RAID Level 
+parameters) 
+
+N
+
+1
+−
+
+Sj =  ∑
+
+i
+
+=
+
+0
+
+{IF Ji ≥ j  
+
+{IF Ji ≥ j  
+
+N
+
+1
+−
+
+Sj =  ∑
+
+i
+
+=
+
+0
+
+THEN Li ELSE 0 } 
+Tj = ∑
+
+Sv 
+
+j
+
+v 0
+=
+0 
+
+THEN Li ELSE 0 } 
+j
+
+Tj = ∑
+
+Sv 
+
+v 0
+=
+M-1 
+
+ 
+
+Figure 35 gives an example of a Spanned SRL VD with five BVDs. 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+91 
+
+Figure 35:  Spanned Secondary RAID Level (SRL=03) 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+ 
+
+92 
+
+5  DDF Structure 
+
+5.1  DDF Structure Overview 
+
+A DDF structure MUST reside on every physical disk that participates in a RAID configuration in a RAID 
+storage subsystem. A minimum of 32MB MUST be reserved on each physical disk for a DDF structure. 
+The last block of the reserved space MUST be the last addressable block of the physical disk.  
+
+Figure 36 illustrates the conceptual format of the DDF Structure on a physical disk with M addressable 
+blocks. The DDF structure contains nine section types that are listed in Table 19. 
+
+Figure 36:  DDF Structure 
+
+ 
+
+   
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+93 
+
+Table 19: DDF Sections 
+
+Contents 
+
+DDF Header 
+Controller Data 
+Physical Disk Records 
+Virtual Disk Records 
+Configuration Records 
+Physical Disk Data 
+Bad Block Management Log 
+ Diagnostic Space 
+Vendor Specific Logs 
+
+Context
+
+Global 
+
+Global 
+Global 
+Global 
+Local 
+Local 
+Local 
+
+Local 
+
+Vendor specific 
+
+ 
+
+The DDF Header section has three types. The Anchor DDF Header MUST be stored at the end of the 
+physical disk. The last block of the Anchor DDF Header MUST be the last addressable logical block on a 
+physical disk. The Anchor DDF Header contains a pointer to the Primary DDF Header. If DDF structure 
+redundancy is implemented, the Anchor DDF Header also contains a pointer to the Secondary DDF 
+Header.  
+
+Figure 36 shows an example of a DDF structure with redundant entries. Redundancy is OPTIONAL but if 
+it is implemented the values of all fields in all section types except DDF Header sections MUST be equal 
+in both the primary and secondary locations. Furthermore, the offset of the beginning of secondary 
+sections from the start of the Secondary DDF Header MUST be equal to the offset of the beginning of the 
+primary sections from the start of the Primary DDF Header. There MUST be only one DDF structure 
+stored on a physical disk. The physical disk MUST not be partitioned using a partition table or another 
+mechanism. The partitioning of capacity is handled by the DDF structure using the concept of Virtual 
+Disks. The term DDF structure includes the Anchor DDF Header, the Primary DDF Header, the 
+Secondary DDF Header, and all DDF Sections described in Table 19.  
+
+Signatures and CRCs are used to delineate the sections of the DDF structure. Sequence numbers are 
+used to manage transitions during configuration and the change/update process. Timestamps are used to 
+provide chronological hints. Configuration groups, Controllers, Physical Disks and Virtual Disks are 
+uniquely identified by using “Globally Unique IDs” (GUIDs). 
+
+The size of sections like Physical Disk Records, Virtual Disk Records and Configuration Records can vary 
+based on the maximum number of physical disks (PDs), virtual disks (VDs) and the maximum number of 
+physical disks configurable within a virtual disk (PD per VD) a given implementation supports. This makes 
+the DDF structure size variable.  
+
+A minimum of 32MB MUST be reserved on each physical disk to accommodate redundant DDF sections, 
+optional spare blocks, and vendor specific logs or work space. It is NOT RECOMMENDED that redundant 
+copies of DDF be placed adjacent to each other. 
+
+5.2  Byte Ordering 
+
+Each section of the DDF MUST be stored in big-endian format (i.e., the more significant bytes of the 
+section are stored in lower addresses in relation to bytes of lesser significance). Figure 37 gives 
+examples of the ordering of bytes in multi-byte fields.  
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+94 
+
+Figure 37:  Byte Ordering in Multi-Byte Fields 
+
+Multiple character ASCII strings are left justified when stored in multi-byte fields (i.e., the first character in 
+the string is stored in the MSB of a multi-byte field).  If an ASCII string has fewer characters than 
+maximum allowed by the field in which it is to be stored, all unused bytes in the field MUST be filled with 
+the ASCII character for “space.”    Figure 38 gives the example of the 4-byte ASCII string “ABCD” stored 
+in a 6-byte field. 
+
+ 
+
+Figure 38:  ASCII String Justification 
+
+Figure 39 gives an example of the byte ordering in the Controller Data Section of a DDF structure. The 
+Controller Data Section is defined in Section 5.6 of this document. 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+95 
+
+ 
+
+ 
+
+Byte
+
+7
+
+6
+
+5
+
+4
+
+3
+
+2
+
+1
+
+0
+
+0
+1
+
+2
+3
+4
+
+5
+6
+
+7
+8
+9
+
+14
+
+15
+16
+
+17
+
+30
+31
+32
+
+33
+34
+
+35
+36
+37
+
+38
+39
+
+40
+41
+
+62
+63
+64
+65
+
+(MSB)
+
+(MSB)
+
+(MSB)
+
+(MSB)
+
+(MSB)
+
+(MSB)
+
+(MSB)
+
+(MSB)
+
+(MSB)
+
+Controller Data
+Signature
+
+Bit
+
+CRC
+
+Vendor ID
+
+Serial Number
+
+PCI Vendor ID
+
+PCI Device ID
+
+PCI Sub Vendor ID
+
+PCI Sub Device ID
+
+Reserved
+
+Vendor Unique 
+Controller Data
+
+(LSB)
+
+(LSB)
+
+(LSB)
+
+(LSB)
+
+(LSB)
+
+(LSB)
+
+(LSB)
+
+(LSB)
+
+Controller GUID
+
+Controller Type
+
+Block_Size - 2
+Block_Size - 1
+
+ 
+
+Figure 39:  Controller Data Byte Ordering Example 
+
+(LSB)
+
+ 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+96 
+
+5.3  Signatures, Timestamps and CRCs 
+
+Signatures are unique 32-bit fields indicating the start of different sections in the DDF structure.  Table 20 
+lists the signatures used by the DDF structure. 
+
+Table 20:  DDF Signatures 
+
+Signature Name 
+DDF_Header 
+Controller_Data 
+Physical_Disk_Records 
+Physical_Disk_Data 
+Virtual_Disk_Records 
+VD_Configuration_Record 
+Spare_Assignment_Record 
+VU_Configuration_Record  
+Vendor_Specific_Log 
+Bad_Block_Management_Log 
+ 
+
+Signature Value 
+0xDE11DE11 
+0xAD111111 
+0x22222222 
+0x33333333 
+0xDDDDDDDD 
+0xEEEEEEEE 
+0x55555555 
+0x88888888 
+0x01DBEEF0 
+0xABADB10C 
+
+Notes 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+Timestamps are used to provide chronological hints for a number of DDF structures. A timestamp MUST 
+be the number of seconds that have occurred since midnight GMT of January 1, 1980 and the time the 
+timestamp is created. 
+
+The CRC MUST be calculated for a given structure with 0xFFFFFFFF as the initial and default value for 
+the CRC field in the structure. The CRC MUST calculated according to the CRC-32 algorithm described in 
+ISO 3309 and in section 8.1.1.6.2 of ITU-T V.42. The CRC MUST be calculated using following 
+polynomial: 
+
+ 
+X^32+X^26+X^23+X^22+X^16+X^12+X^11+X^10+X^8+X^7+X^5+X^4+X^2+X+1. 
+
+Once the CRC is calculated, the calculated value MUST replace the 0xFFFFFFFF stored in the CRC field 
+during calculation. 
+
+5.4  GUIDs 
+
+The Globally Unique Identifier (GUID) is a structure used to uniquely identify the Controllers, Physical and 
+Virtual Disks. It MUST be 24 bytes in length. A valid GUID MUST NOT use the values 0x20, 0x00 and 
+0xFF in Byte0 (MSB). These values in Byte 0 are reserved. 
+
+5.4.1  Controller GUID 
+
+The Controller GUID MUST be an ASCII string built by combining the T10 Vendor ID and the last 16 
+characters from the controller serial number. Information on T10 Vendor IDs and how to obtain one can 
+be found at the T10 website (www.t10.org). Following is an example of a controller GUID, where the 
+controller serial number is “11-10800BE10318” and the vendor name is “VendorID”, 
+
+V  E  N  D  O  R  I  D    1
+
+0 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+7  8 
+
+ 
+
+1
+
+ 
+
+-
+
+ 
+
+1
+
+ 
+
+0
+
+ 
+
+8
+
+ 
+
+0
+
+ 
+
+0
+
+ 
+
+B
+
+ 
+
+E
+
+ 
+
+1  0  3  1
+
+8
+
+ 
+
+ 
+
+ 
+
+  23
+
+ 
+
+ 
+
+ 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+97 
+
+If the T10 Vendor ID is less than eight characters or the controller serial number is less than 16 
+characters, the fields MUST be padded by ‘space’ (0x20) to achieve the required length. Padding MUST 
+be placed between the vendor name and serial number. 
+
+NOTE: If there is no serial number defined for the controller, then the 16 byte serial number field MUST 
+be built by concatenating an 8-byte ASCII representation of a 4-byte timestamp (bytes 8-15) and an 8-
+byte ASCII representation of a 4-byte random number (bytes 16-23).  This number SHOULD be created 
+on the first configuration and stored in the controller’s non-volatile memory. This field SHOULD NOT be 
+user modifiable so that it remains constant for the controller’s life from user’s perspective. 
+
+5.4.2  Physical Disk GUID 
+
+The Physical Disk (PD) GUID MUST be 24 byte field.  
+
+For physical disks that are accessed using SCSI commands (e.g., Parallel SCSI, Serial Attached SCSI, 
+and Fibre Channel physical disks), the PD GUID MUST be built by combining the T10 Vendor ID of the 
+disk vendor with the identifier returned by INQUIRY page 83h (Association=0 Identifier Type=1h, 2h, 3h 
+or 8h) or the serial number returned in EVPD page 80h, or with the serial number returned in VPD page 
+89h (for SATA disks).  If the identifier returned by INQUIRY page 83 or the disk serial number in EVPD 
+page 80h is longer than 16 bytes, then the 16 least significant bytes MUST be used and the higher bytes 
+discarded. If the serial number returned by EVPD page 80h is ‘left justified’ with spaces in the least 
+significant bytes, the serial number MUST be ‘right justified’ before discarding the higher bytes and using 
+the 16 least significant bytes. If VPD page 89h is used to return the SATA disk serial number, a ‘space’ 
+(0x20) MUST separate the string “HDD” from the 20 byte disk serial number. If the vendor name is less 
+than eight characters or the disk serial number/identifier is less than 16 characters, the fields MUST be 
+padded by ‘space’ (0x20) to achieve the required length. Padding MUST be placed between the vendor 
+name and serial number/identifier. The following is an example of a PD_GUID for a SCSI disk, where the 
+serial number/identifier is “5G45B673” and the T10 Vendor ID is “HDD.” 
+
+H  D  D   
+
+ 
+
+0 
+
+ 
+
+ 
+
+3  4 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+7  8 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+  5
+
+ 
+
+ 
+
+G
+
+ 
+
+4
+
+ 
+
+5  B  6  7
+
+3
+
+ 
+
+ 
+
+ 
+
+  23
+
+When a serial number is not available for physical disks accessed using SCSI commands or the 
+PD_GUID generated is not unique among the disks accessed by the controller, the controller MUST 
+generate a forced serial number by concatenating an eight byte current date in “yyyymmdd” ASCII format 
+and an eight byte hexadecimal ASCII representation of a four byte random number. The GUID generated 
+using this serial number is considered a forced PD GUID and the Forced_PD_GUID_Flag in the PD_Type 
+field of the Physical Disk Entry (Section 5.7.1) for the physical disk MUST be set. In addition, the 
+Forced_PD_GUID_Flag in the disk’s Physical_Disk_Data section MUST also be set (Section 5.10).  The 
+controller MUST guarantee that a Forced PD GUID is unique among the drives accessed by the 
+controller. The following is an example of a forced PD GUID, where the date is February 1, 2004, the 
+eight byte hexadecimal ASCII representation of the four byte random number is “AABBCCDD” and the 
+disk’s T10 Vendor ID is “HDD.” 
+
+H  D  D   
+
+0 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+  2  0
+
+7  8 
+
+ 
+
+0
+
+ 
+
+4
+
+ 
+
+0
+
+ 
+
+2
+
+ 
+
+0
+
+ 
+
+1  A
+
+ 
+
+ 
+
+A
+
+ 
+
+B
+
+ 
+
+B  C  C  D
+
+D
+
+ 
+
+ 
+
+ 
+
+  23
+
+ 
+
+ 
+
+ 
+
+For ATA or SATA physical disks, PD_GUID MUST be built by combining the three character ASCII string 
+“ATA”, with the 20-byte disk serial number as reported in response to ATA Identify Device command 
+(bytes 20-39). A ‘space’ (0x20) MUST separate the string “ATA” from the disk serial number.   The 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+98 
+
+following is an example of PD_GUID for an ATA disk where the serial number is 
+“BB583GX3389103443379.” 
+
+A  T  A 
+
+   B  B  5  8  3  G
+
+0 
+
+ 
+
+ 
+
+3  4 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+X
+
+ 
+
+3
+
+ 
+
+3
+
+ 
+
+8
+
+ 
+
+9
+
+ 
+
+1  0
+
+ 
+
+ 
+
+3
+
+ 
+
+4
+
+ 
+
+4  3  3  7
+
+9
+
+ 
+
+ 
+
+ 
+
+  23
+
+When a serial number is not available for ATA or SATA physical disks, the controller MUST generate one 
+by concatenating an eight character current date in “yyyymmdd” ASCII format and a twelve byte 
+hexadecimal ASCII representation of a six byte random number. The GUID generated using this serial 
+number is considered a forced PD_GUID and the Force_PD_GUID_Flag in the PD_Type field of the 
+Physical Disk Entry (Section 5.7.1) for the physical disk MUST be set. In addition, the 
+Forced_PD_GUID_Flag in the disk’s Physical_Disk_Data section MUST also be set (Section 5.10).  The 
+following is an example of a forced PD GUID, where the date is February 1, 2004 and the twelve byte 
+hexadecimal ASCII representation of the six byte random number is “AABBCCDDEEFF” 
+
+A  T  A 
+
+   2  0  0  4  0  2
+
+0 
+
+ 
+
+ 
+
+3  4 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+0
+
+ 
+
+1
+
+ 
+
+A
+
+ 
+
+A
+
+ 
+
+B
+
+ 
+
+B  C
+
+ 
+
+ 
+
+C
+
+ 
+
+D
+
+ 
+
+D  E  E  F
+
+F
+
+ 
+
+ 
+
+ 
+
+  23
+
+5.4.3  Virtual Disk GUID 
+
+The VD GUID MUST be built by concatenating the creating controller’s T10 Vendor ID with a 16 byte 
+unique identifier. The 16 byte identifier MAY be created by concatenating the Controller_Type field from 
+Controller Data (Section 5.6), a 4-byte timestamp, and a 4-byte random number. Using this method, the 
+VD_GUID provides data about age and the creating controller type. The following is an example of a 
+VD_GUID with a vendor ID of “VENDORID”, a Controller_Type field of “AAAAAAAA”, a time stamp of 
+“BBBB”, and a random number of “CCCC.”  
+
+V  E  N  D  O  R  I  D  A  A
+
+A
+
+A  B
+
+B
+
+B  C  C  C
+
+C
+
+0 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+7  8 
+
+ 
+
+  15 16
+
+  19  20   
+
+  23
+
+A
+
+ 
+
+A
+
+ 
+
+A
+
+ 
+
+A
+
+ 
+
+Alternatively, the unique identifier MAY be created by the controller using a vendor specific method. If this 
+method is used, the controller MUST guarantee that the identifier is unique for all virtual disks in the 
+system. 
+
+5.4.4  DDF Header GUID 
+
+The DDF Header GUID MUST be built by concatenating the creating controller’s T10 Vendor ID, the 
+Controller_Type field from Controller Data (Section 5.6), a 4-byte timestamp, and a 4-byte random 
+number. The DDF_GUID provides data about age and the creating controller type. The following is an 
+example of a DDF_GUID with a vendor ID of “VENDORID”, a Controller_Type field of “AAAAAAAA”, a 
+time stamp of “BBBB”, and a random number of “CCCC.”  
+
+ 
+
+ 
+
+ 
+
+ 
+
+B
+
+ 
+
+B
+
+ 
+
+V  E  N  D  O  R  I  D  A  A
+
+A
+
+A  B
+
+B
+
+B  C  C  C
+
+C
+
+0 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+7  8 
+
+ 
+
+  15 16
+
+  19  20   
+
+  23
+
+A
+
+ 
+
+A
+
+ 
+
+A
+
+ 
+
+A
+
+ 
+
+5.5  DDF Header 
+
+Three types of DDF header are defined: Anchor, Primary, and Secondary. The fields used in the DDF 
+Headers are defined in Table 21. The Anchor, Primary and Secondary headers in the DDF structure 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+99 
+
+MUST have the same value in all fields except the CRC, Sequence_Number, Open_Flag and 
+Header_Type.  The Anchor header is NOT REQUIRED to track configuration changes and does not use 
+the Sequence_Number and Open_Flag fields. All DDF Headers MUST adhere to the field definitions and 
+uses described in Table 21.  
+
+DDF headers are global in context. Disks with different block sizes that participate in the same DDF 
+structure will have differing values in the DDF Header fields whose values are based on a calculation 
+related to block size. 
+
+Description 
+
+Size 
+(Bytes) 
+4 
+
+Table 21:  DDF Header Fields 
+
+Element       
+
+Signature 
+
+CRC 
+
+DDF_rev 
+
+DDF_Header_GUID 
+
+24 
+
+4 
+
+8 
+
+Unique Signature for DDF_Header Section (See Table 
+20) 
+CRC for the section (See Section 5.3). The CRC is 
+covers the entire DDF Header section. 
+GUID for the configuration or group (See 
+Section5.4.4) 
+This field contains the revision number of the DDF 
+specification to which this DDF structure adheres. 
+If the DDF structure adheres to an official 
+version of the DDF specification, this field MUST 
+contain an ASCII string in xx.yy.zz format, where 
+x, y, and z are integer values 0-9. xx is the 
+major revision number. yy is the minor revision 
+number and zz is the development revision number. 
+Minor DDF revisions are backward compatible to 
+other minor revisions within the same major 
+revision category.   
+ 
+This field MAY also be used to state that the 
+structure does not adhere to an official version 
+of the DDF specification but is a vendor unique 
+implementation of the structure.  If the DDF 
+structure uses a vendor unique specification, this 
+field MUST be an ASCII string in CCxxxxxx format, 
+where C is any non-numeric character. x can be any 
+character. 
+ 
+NOTE: The specification allows vendor unique 
+implementations to be marked as such to allow a 
+controller to notify the system administrator 
+before importing or erasing configurations created 
+using a vendor unique implementation of a DDF 
+structure. 
+ 
+Note: The DDF_rev for this version of the DDF 
+specification is 02.00.00. 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+100 
+
+Sequence_Number 
+
+4 
+
+Timestamp 
+
+Open_Flag 
+
+4 
+
+1 
+
+Sequence number for configuration changes. Initial 
+value MUST be 0x00000001. Wraparound is indicated 
+by 0x00000000. Updating the Sequence_Number is 
+OPTIONAL when the Vendor Specific Logs section, 
+the Bad Block Management section or the Diagnostic 
+Space section is updated. MUST be set to 
+0xFFFFFFFF in the Anchor header to indicate that 
+configuration changes are not tracked in the 
+Anchor Header. 
+Header update timestamp. MUST be set when the DDF 
+header is updated. Used for a chronological hint 
+only as this may not be consistent across 
+controllers in the configuration. 
+DDF open/close flag. The DDF Open_Flag MUST be set 
+on a physical disk before starting configuration 
+change writes to the physical disk. The flag MUST 
+be cleared (i.e., set to 0x00) after a successful 
+write of configuration data to the physical disk. 
+Open_Flag MUST NOT be set during log entry 
+updates. This field MUST be set to 0xFF in the 
+Anchor Header. The valid values for the flag are: 
+ 
+0x00 = DDF closed; 
+0x01-0x0F = DDF Opened; 
+0x10-0xFE = Reserved; 
+0xFF = Not tracking DDF open/close. Used in the 
+Anchor Header. 
+ 
+NOTE: Any value of 0x01 through 0x0F means that 
+the DDF structure is open. An implementation MAY 
+use different values for different reasons the DDF 
+structure is open. However, these reasons are not 
+defined in the specification and may differ 
+between different implementations. 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+101 
+
+Foreign_Flag 
+
+1 
+
+Disk_Grouping 
+
+1 
+
+Reserved 
+Header_Ext 
+Primary_Header_L
+BA 
+Secondary_Header
+_LBA 
+
+Header_Type 
+
+Reserved 
+Workspace_Length 
+
+13 
+32 
+8 
+
+8 
+
+1 
+
+3 
+4 
+
+Foreign_Flag MAY be set when the controller has 
+not imported the configuration defined by this DDF 
+structure. With this flag set (and CRC 
+recalculated/updated), nothing else is changed in 
+the DDF structure and this physical disk MUST be 
+marked as foreign until configuration is imported, 
+cleared or the physical disk is physically 
+removed. The valid values for this field are: 
+ 
+0x00 = Not Foreign 
+0x01 = Foreign 
+ 
+NOTE-1: This flag allows implementations where 
+foreign configurations are only imported with a 
+user’s explicit acknowledgement. If a user has not 
+acknowledged such an action then this flag is set 
+and foreign configuration is not presented to OS 
+level. This bit is persistent to tolerate 
+controller swaps, denoting original foreign 
+physical disks when the new controller sees all 
+physical disks as foreign. 
+NOTE-2: Some implementations prefer not to set the 
+Foreign_Flag automatically. This allows a 
+configuration to be moved back to the original 
+controller without the original controller seeing 
+the configuration as Foreign.  
+Disk Grouping enforced/not enforced. When this 
+field is set Disk Grouping MUST be enforced. The 
+valid values for this field are: 
+ 
+0x00 = Not Enforced 
+0x01 = Enforced 
+ 
+Filled with 0xFF 
+Filled with 0xFF – Reserved for future use. 
+LBA of the DDF Header of Primary DDF Structure.  
+
+LBA of the DDF Header of the Secondary DDF 
+structure. This field MUST be filled with 0xFF if 
+redundant DDF structures are not stored. 
+0x00 = Anchor DDF Header; Stored on the last block 
+of the physical disks 
+0x01 = Primary DDF Header 
+0x02 = Secondary DDF Header 
+Filled with 0xFF 
+Block count for reserved workspace that MAY be 
+used for optional vendor specific functions. At 
+least 16MB MUST be reserved for workspace. Thus, 
+this field MUST have a value greater than or equal 
+to 32,768/Block_Size where Block_Size is the block 
+size of the physical disk on which this DDF_Header 
+structure resides. Block size is stored in the 
+Block_Size field of the Physical Disk Entry 
+associated with the physical disk (See Section 
+5.7.1). 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+102 
+
+Workspace_LBA 
+Max_PD_Entries 
+
+8 
+2 
+
+Max_VD_Entries 
+
+2 
+
+Max_Partitions 
+
+Configuration_Re
+cord_Length 
+
+2 
+
+2 
+
+Max_Primary_ 
+Element_Entries 
+
+2 
+
+Max_Mapped_Block
+_Entries 
+
+4 
+
+Reserved 
+Controller_Data_
+Section 
+
+Controller_Data_
+Section_Length 
+Physical_Disk_Re
+cords_Section 
+
+50 
+4 
+
+4 
+
+4 
+
+LBA of the first block of the reserved workspace.  
+Maximum number of Physical Disk Entries. This is 
+implementation dependent. Actual number of 
+Physical Disks supported by a controller MAY be 
+less than number of entries allowed. DDF structure 
+implementations MUST only allow values of 15 
+(0x000F), 63 (0x003F), 255 (0x00FF), 1023 
+(0x03FF), and 4095 (0x0FFF). 
+Maximum number of Virtual Disk Entries. This is 
+implementation dependent. Actual number of Virtual 
+Disks supported by a controller MAY be less than 
+number of entries allowed.  
+DDF structure implementations MUST only allow 
+values of 15 (0x000F), 63 (0x003F), 255 (0x00FF), 
+1023 (0x03FF), and 4095 (0x0FFF).  
+Maximum number of Configuration Record Entries 
+(partitions) allowed per disk.  
+Virtual Disk Configuration Record (Section 5.9.1) 
+length in blocks. Depends on the value of 
+Max_Primary_Element_Entries field and calculated 
+using the following formula: 
+  
+ROUNDUP((512+(Max_Primary_Element_Entries*(4+8)))/
+Block_Size)  
+ 
+Block_Size is the value in the Block_Size field of 
+the Physical Disk Entry associated with the 
+physical disk on which this DDF Header structure 
+resides.  
+ 
+The maximum number of physical disks configurable 
+within a basic VD. This field determines value of 
+Configuration_Record_Length. DDF structure 
+implementations MUST only allow values of 16 
+(0x0010), 64 (0x0040), 256 (0x0100), 1024 
+(0x0400), and 4096 (0x1000). 
+ 
+NOTE: The value of this field determines value 
+Configuration_Record_Length and size of two fields 
+in the Virtual Disk Configuration Record: 
+Physical_Disk_Sequence and Starting_Block. 
+The maximum number of supported 
+Mapped_Block_Entries (See Section 5.11) in a 
+physical disk’s Bad Block Management Log. If the 
+Bad Block Management Log section is not 
+implemented, this field MUST be set to 0x00000000. 
+Filled with 0xFF 
+Offset of the start of the Controller Data 
+(Section 5.6) section from the Primary or 
+Secondary DDF Header LBA 
+Length of the Controller Data section in number of 
+blocks 
+Offset of the start of the Physical Disk Records 
+(Section 5.7) section from the Primary or 
+Secondary Header LBA 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+103 
+
+Physical_Disk_Re
+cords_Section_Le
+ngth 
+
+4 
+
+Virtual_Disk_Rec
+ords_Section 
+
+Virtual_Disk_Rec
+ords_Section_Len
+gth 
+
+Configuration_Re
+cords_Section 
+
+Configuration_Re
+cords_Section_Le
+ngth 
+
+Physical_Disk_Da
+ta_Section 
+
+Physical_Disk_Da
+ta_Section_Lengt
+h 
+BBM_Log_Section 
+
+4 
+
+4 
+
+4 
+
+4 
+
+4 
+
+4 
+
+4 
+
+Length of the Physical Disk Records section in 
+number of blocks. This field is dependent on the 
+entry in the Max_PD_Entries field. The value of 
+this field is calculated according to the 
+following formula:  
+ 
+ROUNDUP(((Max_PD_Entries * 64) + 64)/Block_Size)  
+Block_Size is the value in Block_Size field in the 
+Physical Disk Entry associated with the physical 
+disk on which this DDF Header structure resides. 
+Offset of the start of the Virtual Disk Records 
+(Section 5.8) section from the Primary or 
+Secondary DDF Header LBA 
+Length of the Virtual Disk Records section in 
+number of blocks. This value depends on the entry 
+in the Max_VD_Entries field. The value of this 
+field is calculated according to the following 
+formula: 
+ 
+ROUNDUP(((MAX_VD_Entries * 64) + 64)/Block_Size)  
+Block_size is the value in the Block_Size field in 
+the Physical Disk Entry associated with the 
+physical disk on which this DDF Header structure 
+resides. 
+Offset of the start of the Configuration Records 
+(Section 5.9) section from the Primary or 
+Secondary DDF Header LBA 
+Length of the Configuration Records section in 
+number of blocks. The value of this field MUST 
+equal: 
+ 
+Configuration_Record_Length*(Max_Partitions+1). 
+Offset of the start of the Physical Disk Data 
+(Section 5.10)section from the start of the 
+Primary or Secondary DDF Header LBA 
+Length of the Physical Disk Data section in number 
+of blocks 
+
+Offset of the start of the Bad Block Management 
+Log (Section 5.11) from the start of the Primary 
+or Secondary Header LBA. This is an OPTIONAL 
+section and if the section is not implemented this 
+field MUST be set to 0xFFFFFFFF. 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+104 
+
+BBM_Log_Section_
+Length 
+
+4 
+
+Diagnostic_Space 
+
+4 
+
+Diagnostic_Space
+_Length 
+
+Vendor_Specific_
+Logs_Section 
+
+Vendor_Specific_
+Logs_Section_Len
+gth 
+
+4 
+
+4 
+
+4 
+
+Reserved 
+ 
+
+256 
+
+5.6  Controller Data 
+
+Length of the Bad Block Management Log section in 
+number of blocks. This is an OPTIONAL section and 
+if the section is not implemented this field MUST 
+be set to 0x00000000. 
+ 
+If the BBM_Log_Section is implemented, the value 
+of this field calculated according to the 
+following formula: 
+ 
+ROUNDUP(((Max_Mapped_Block_Entries * 16) + 
+32)/Block_Size)  
+ 
+Block_Size is the value in Block_Size field in the 
+Physical Disk Entry associated with the physical 
+disk on which this DDF Header structure resides. 
+Offset of the start of the Diagnostic Space 
+(Section 5.11.1) section from the Primary or 
+Secondary DDF Header LBA. This is an OPTIONAL 
+section and if the section is not implemented this 
+field MUST be set to 0xFFFFFFFF. 
+Length of the Diagnostic Space section in number 
+of blocks. This is an OPTIONAL section and if the 
+section is not implemented this field MUST be set 
+to 0x00000000. 
+Offset of the start of the Vendor Specific Logs 
+(Section 5.13) from the Primary or Secondary DDF 
+Header LBA. This is an OPTIONAL section and if the 
+section is not implemented this field MUST be set 
+to 0xFFFFFFFF. 
+Length of the Vendor Specific Logs section in 
+number of blocks. This is an OPTIONAL section and 
+if the section is not implemented this field MUST 
+be set to 0x00000000. 
+Filled with 0xFF 
+
+This section is global in context and provides information about the last controller that operated on an 
+attached RAID configuration. The Controller Data section MUST adhere to the field definitions and uses 
+described in Table 22.  When a new controller accesses a DDF structure previously operated on by 
+another controller produced by the same vendor, it is up to the vendor implementation to determine 
+whether or not the information stored in the Vendor_Unique_Controller_Data field is used by the new 
+controller. When a new controller accesses a DDF Structure previously operated on by another controller 
+produced by a different vendor, the new controller SHOULD erase the data contained in the 
+Vendor_Unique_Controller_Data field and replace it with data specific to the new controller. 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+105 
+
+Table 22:  Controller Data Fields 
+
+Element       
+
+Signature 
+
+CRC 
+
+Controller_GUID 
+Controller_Type 
+
+Size 
+(Bytes) 
+4 
+
+4 
+
+24 
+8 
+
+Product_ID 
+
+16 
+
+Description 
+
+Unique Signature for Controller_Data Section (See 
+Table 20) 
+CRC for the section (See Section 5.3). The CRC 
+covers the entire Controller_Data section. 
+Controller GUID (See Section 5.4.1) 
+For controllers with a PCI host interface, this 
+field MUST contain the PCI ID of the controller. 
+ 
+Byte 0-1: Vendor ID 
+Byte 2-3: Device ID 
+Byte 4-5: Sub Vendor ID 
+Byte 6-7: Sub Device ID 
+ 
+For controllers with a non-PCI host interface, 
+bytes 6 and 7 of this field MUST be set to 0xFFFF. 
+Bytes 0 through 5 MAY be set to any value at the 
+discretion of the vendor. 
+This field is an ASCII field. This field MUST 
+contain the Product ID of the controller that last 
+operated on the RAID configuration. For 
+controllers that operate using the SCSI protocol, 
+this field MUST be set to the value of the PRODUCT 
+IDENTIFICATION field returned by the controller in 
+the standard Inquiry data. For ATA controllers, 
+this field MUST be set to the value the controller 
+would return for the PRODUCT IDENTIFICATION field 
+in the standard Inquiry data as described in the 
+SCSI / ATA Translation (SAT) standard (INCITS 431-
+2007). For controllers that use neither the SCSI 
+nor ATA protocols, the controller MUST create a 
+Product_ID. 
+Filled with 0xFF; Reserved for future use. 
+
+448   Vendor unique controller data.  
+
+Reserved 
+Vendor_Unique 
+_Controller_Data 
+ 
+
+8 
+
+5.7  Physical Disk Records 
+
+The Physical Disk Records section MUST list all configured physical disks attached to the controller. A 
+physical disk is considered configured when it belongs to a Virtual Disk, is marked as a Spare, is 
+configured as a Legacy (pass-through) disk or is a physical disk that needs to be tracked by the controller 
+for a vendor-specific reason. This section is global in context (i.e., every configured physical disk has 
+information about all configured physical disks participating in the system described by the DDF 
+structure). This allows the detection of missing physical disks after a controller swap.  
+
+The length of this section is variable and is a function of maximum number of physical disks supported by 
+the implementation. All Physical Disk Records sections MUST adhere to the field definitions and uses 
+described in Table 23. 
+
+ 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+106 
+
+Table 23:  Physical Disk Records Fields 
+
+Description 
+
+Size 
+(Bytes) 
+4 
+
+Element       
+
+Signature 
+
+CRC 
+
+Populated_PDEs 
+
+Max_PDE_Supporte
+d 
+Reserved 
+Physical Disk En
+tries 
+ 
+
+Unique Signature for Physical_Disk_Records Section 
+(see Table 20). 
+CRC for the section (Section 5.3). The CRC covers 
+the entire Physical_Disk_Records section.  
+Number of Physical Disk Entries (PDE) 
+used/populated 
+Number of maximum PDE supported by vendor 
+
+4 
+
+2 
+
+2 
+
+52 
+vari-
+able 
+
+Filled with 0xFF
+64-byte PDEs. The number of PDE entries in this 
+section is equal to Max_PD_Entries.  
+
+5.7.1  Physical Disk Entries 
+
+Physical Disk Entries (PDE) give minimal information about all physical disks attached to the controller. 
+PDEs are stored in the Physical Disk Records section (Section 5.7) Each PDE is a 64 byte structure. 
+Each PDE MUST adhere to the definitions and uses of the fields described in Table 24. 
+
+ 
+
+Table 24:  Physical Disk Entry Fields 
+
+Element       
+
+PD_GUID 
+
+Size 
+(Bytes) 
+24  
+
+Description 
+
+PD_Reference 
+
+4 
+
+PD_Type 
+
+2 
+
+Physical Disk GUID (Section 5.4.2) for the 
+physical disk. If this entry refers to the 
+physical disk on which it is currently stored, the 
+value of this field MUST contain the same value as 
+the PD_GUID field in the Physical Disk Data 
+section (Section 5.10). For unused entries, this 
+field MUST be filled with 0xFF.  
+Reference number to be used in VD Configuration 
+Records (Section 5.9.1). This field MUST equal the 
+value of the PD_Reference field of a physical 
+disk’s corresponding Physical Disk Data (Section 
+5.10) 
+Bit map describing a physical disk’s type. 
+ 
+Bit 0: 0 – Not using a forced PD_GUID (Section 
+
+5.4.2) 
+
+ 
+
+1 - Using a forced PD_GUID (also called the 
+
+Forced_PD_GUID_Flag)  
+
+Bit 1: 0 – Not participating in a VD 
+ 
+Bit 2: 0 – Not a global spare 
+ 
+
+1 – Participating in a VD 
+
+1 – Global spare (VD Configuration Records 
+
+are ignored) 
+
+Bit 3: 0 – Not a spare disk 
+ 
+
+1 – Spare disk (Bit2 and Bit3 are exclusive. 
+Bit3 MUST have precedence over Bit2) 
+
+Bit 4: 0 – Not foreign 
+ 
+
+1 – Foreign (This is a Foreign disk and the 
+
+Foreign_Flag in the DDF Header on this 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+107 
+
+PD_State 
+
+2 
+
+disk may be set. See Section 5.5) 
+
+Bit 5: 0 – Not a Pass-through/Legacy disk 
+ 
+
+1 - Pass-through/Legacy disk (No DDF 
+
+structure is stored on this physical 
+disk as DDF structures are only stored 
+on configured physical disks and in the 
+controller. If there are no other 
+configured physical disks attached to 
+the controller, then this information 
+would only be stored in controller 
+NVRAM. An implementation MAY restrict 
+Pass-through/Legacy physical disks to 
+systems with at least one configured 
+disk attached to the RAID controller) 
+
+ 
+
+Bit 6: Reserved 
+Bit 7: Reserved 
+Bits 8-11: Reserved 
+Bits 15-12: Interface Type 
+0x0 = Unknown 
+ 
+0x1 = SCSI (parallel) 
+ 
+0x2 = SAS 
+ 
+0x3 = SATA 
+ 
+0x4 = FC 
+ 
+ 
+0x5-0xF = Reserved 
+ 
+All reserved bits MUST be set to 0. 
+State of the physical disk as part of one or more 
+Virtual Disks. 
+ 
+Bit 0: 0 – Offline 
+ 
+Bit 1: 0 – OK 
+ 
+1 – Failed 
+Bit 2: 0 – Not Rebuilding 
+ 
+
+1 - Online 
+
+1 – Rebuilding (Physical disk rebuilding for 
+
+a failed physical disk) 
+
+Bit 3: 0 – Not in Transition 
+ 
+
+1 - Transition (e.g., replacing a member 
+
+physical disk through a copy operation) 
+
+Bit 4: 0 – No PFA/SMART error alerts 
+1 - PFA/SMART error alerts 
+ 
+Bit 5: 0 - No Un-recovered Read Errors 
+ 
+Bit 6: 0 - Not missing 
+ 
+
+1 - Un-recovered Read Errors 
+
+and Missing) 
+
+1 - Missing (a physical disk may be Failed 
+
+Bit 7: Reserved 
+Bits 8-15: Reserved 
+ 
+All reserved bits MUST be set to 0. 
+ 
+NOTE-1: Bit 1 MUST have precedence among Bits 0-3. 
+If Bit 0 and Bit 1 are both set, then the physical 
+disk’s status is Failed and was probably Online 
+before status change. 
+  
+NOTE-2: For a physical disk participating in 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+108 
+
+Configured_Size 
+
+8 
+
+Path_Information 
+
+18 
+
+multiple VDs, the disk status Bits 1-3 MUST be set 
+if any part of the physical disk is going through 
+the corresponding process.  
+Configured size of the physical disk in terms of 
+highest addressable LBA during normal operation. 
+The DDF structure MUST be stored at LBAs greater 
+than or equal to the value in this field.  
+This field contains information on the path from a 
+controller to a physical disk or the attach point 
+of the physical disk. This field is used for 
+information purposes only.  
+ 
+The Path_Information structure depends on the 
+physical disk Interface Type as defined in Bits 
+12-15 of the PD_Type field.   
+ 
+For Interface Type = 0x01 (SCSI), the 
+Path_Information structure MUST be interpreted as 
+follows:  
+ 
+Bytes 0-3: Path 0 information 
+
+ 
+Bytes 4-7: Path 1 information (for systems with 
+multiple paths for redundancy) 
+
+Bits 7-0:   LUN 
+Bits 15-8:  SCSI Target ID 
+Bits 23-16: SCSI Channel 
+Bits 30-24: Reserved 
+Bit 31:    0 - Path 0 OK 
+ 
+
+ 
+
+  1 – Path 0 Broken 
+
+Bits 7-0:   LUN 
+Bits 15-8:  SCSI Target ID 
+Bits 23-16: SCSI Channel 
+Bits 30-24: Reserved 
+Bit 31:    0 - Path 1 OK 
+ 
+ 
+
+ 
+
+  1 – Path 1 Broken 
+
+ 
+
+Bytes 8-17: Reserved 
+ 
+For Interface Type = 0x2 (SAS), the 
+Path_Information structure MUST be interpreted as 
+follows: 
+ 
+Bytes 0-7: Path 0 - SAS address of the end device 
+(edge expander or controller) where the physical 
+disk is attached. 
+Bytes 8-15: Path 1 - SAS address of the end device 
+(edge expander or controller) where the physical 
+disk is attached. 
+ 
+Byte 16: 
+  Bit 0-6: Path 0 PHY identifier 
+  Bit 7:   0 – Path 0 OK 
+   
+ 
+Byte 17: 
+  Bit 0-6: Path 1 PHY identifier 
+  Bit 7:   0 – Path 1 OK 
+
+1 – Path 0 Broken 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+109 
+
+   
+
+1 – Path 1 Broken 
+
+ 
+ 
+For Interface Type = 0x3 (SATA), the 
+Path_Information structure MUST be interpreted as 
+follows: 
+ 
+Bytes 0-7: Path 0 - Address of the end device in a 
+SAS domain (edge expander or controller) where the 
+physical disk is attached. 
+Bytes 8-15: Path 1 - Address of the end device in 
+a SAS domain (edge expander or controller) where 
+the physical disk is attached. 
+ 
+Byte 16: 
+  Bit 0-6: Path 0 PHY identifier 
+  Bit 7:   0 – Path 0 OK 
+ 
+   
+Byte 17: 
+  Bit 0-6: Path 1 PHY identifier 
+  Bit 7:   0 – Path 1 OK 
+ 
+All reserved bytes or bits MUST be set to 0. 
+ 
+NOTE-1: Path 1 information bytes MUST be set to 
+0xFF when dual path support is not implemented for 
+this physical disk. 
+ 
+NOTE-2: For FC physical disks, this field is 
+undefined and all bytes MUST be set to 0x00. 
+Logical block size of the disk in bytes. DDF 
+implementations MUST only allow the following 
+values in this field: 512, 1024, and 4096. Values 
+other than 512, 1024 or 4096 are allowed but these 
+values indicate vendor unique implementations. 
+Filled with 0xFF 
+
+1 – Path 0 Broken 
+
+1 – Path 1 Broken 
+
+   
+
+Block_Size 
+
+Reserved 
+ 
+
+2 
+
+4 
+
+5.8  Virtual Disk Records 
+
+The Virtual Disk Records section lists all the configured VDs tracked by the DDF structure. It has global 
+context and MUST be stored on all configured physical disks. The length of this section is variable and is 
+a function of the maximum number of configurable virtual disks supported by the system implementation. 
+The Virtual Disk Records section MUST adhere to the field definitions and uses described in Table 25. 
+
+Table 25:  Virtual Disk Records Fields 
+
+Description 
+
+ 
+
+Element       
+
+Signature 
+
+CRC 
+
+Populated_VDEs 
+Max_VDE_Supporte
+d 
+
+Size 
+(Bytes) 
+4 
+
+4 
+
+2 
+2 
+
+Unique Signature for Virtual_Disk_Records Section 
+(See Table 20) 
+CRC for the section (See Section 5.3). The CRC 
+covers the entire Virtual Disk Records section. 
+Number of Virtual Disk Entries used/configured 
+Maximum number of VDEs supported by the 
+implementation 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+110 
+
+52 
+vari-
+able 
+
+Filled with 0xFF 
+64 Byte VDEs. The number of VDEs in this field is 
+equal to Max_VD_Entries. 
+
+Reserved 
+Virtual_Disk_Ent
+ries 
+ 
+
+5.8.1  Virtual Disk Entries 
+
+Virtual Disk Entries (VDE) contain information about the configured VDs. VDEs are stored in the Virtual 
+Disk Records (Section 5.8). Each VDE MUST adhere to the definitions and uses described in Table 26. 
+
+Table 26:  Virtual Disk Entry Fields 
+
+Element       
+
+VD_GUID 
+
+Size 
+(Bytes) 
+24 
+
+Description 
+
+VD_Number 
+
+2 
+
+Virtual Disk GUID (Section 5.4.3). For unused 
+Virtual Disk Entries, this field MUST be filled 
+with 0xFF.  
+The VD_Number MAY be used to map directly to the 
+IDs (e.g., Logical Unit Numbers) presented to the 
+OS as the result of an enumerate targets type 
+command (e.g., SCSI Report LUNs command). For 
+internal SCSI RAID controllers, the VD_Number MAY 
+correspond directly to the LUN number reported to 
+the OS. However, for external RAID controllers 
+that have LUN masking and LUN mapping, the 
+VD_Number cannot be used for this purpose and the 
+RAID controller will have to implement its own 
+method for maintaining this information. The 
+VD_Number field needs to be managed during import 
+MUST be consistent across reboots. Valid range is 
+0-0x7FFF. 0x8000-0xFFFF is reserved.  
+Reserved Filled with 0xFF 
+Bitmap describing the VD’s type.  
+ 
+Bit 0: 0 – Private 
+ 
+
+1 - Shared (Disk Grouping MUST be enforced 
+
+when this bit is set) 
+
+1 – Disk Grouping Enforced 
+
+Bit 1: 0 – No Disk Grouping 
+ 
+Bit 2: 0 – VD_Name in ASCII format 
+ 
+Bit 3: 0 – Owner ID Not Valid 
+ 
+Bits 15-4: Reserved 
+Bits 31-16: Primary Controller GUID CRC. Used as a 
+
+1 – VD_Name in Unicode format 
+
+1 – Owner ID Valid 
+
+hint for the last controller that 
+owned a VD in a clustered environment. 
+The value stored in these bits MUST be 
+the 16-bit CRC of the Controller GUID. 
+
+ 
+All reserved bits MUST be set to 0. 
+ 
+NOTE-1: Bits 16-31 MUST be ignored when Bit 0 is 
+clear. 
+NOTE-2: If Bit 0 is set, the value of Bit 1 MUST 
+be ignored since Disk Grouping is automatically 
+enforced. 
+
+Reserved 
+VD_Type 
+
+2 
+4 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+111 
+
+VD_State 
+
+1 
+
+NOTE-3: If the Disk_Grouping field in the DDF 
+Header is set to 0x01, Bit 1 MUST be ignored since 
+Disk Grouping is automatically enforced for all 
+disks.   
+NOTE-4: If Bit 1 is set, disk grouping MUST be 
+enforced for all disks participating in the 
+virtual disk. This bit allows disk grouping to be 
+enforced on some drives in a DDF configuration and 
+not enforced on other drives.  
+NOTE-5: If Bit 2 is set, the value stored in the 
+VD_Name field MUST be compliant with Version 4.0 
+of the Unicode standard. 
+NOTE-6: If Bit 3 is clear, bits 16-31 are invalid. 
+If Bit 3 is set, bits 16-31 are valid.  
+Bitmap describing the state of the virtual disk.  
+ 
+Bits 2-0: 
+
+0x0 - Optimal (The VD is operating and has 
+experienced no failures of the disks 
+that comprise VD.) 
+
+0x1 = Degraded (The VD has experienced at 
+least one failure of the disks that 
+comprise the VD. One more disk failure 
+could result in the VD being placed in 
+the “Failed” state indicating data 
+loss has occurred.)  
+
+0x2 = Deleted (The VD has been marked as 
+
+deleted by the system.) 
+
+0x3 = Missing (The VD has been marked as 
+
+missing by the system.) 
+
+0x4 = Failed (The VD has experienced enough 
+
+failures of the disks that comprise 
+the VD for unrecoverable data loss to 
+occur.) 
+
+0x5 = Partially Optimal (The VD has 
+
+experienced one or more disk failures. 
+The VD can experience at least one 
+more disk failure before it is placed 
+in the “Degraded” state.) 
+0x6 = Offline (The VD is offline for 
+
+maintenance. Data on the VD is not 
+available.)  
+
+0x7 = Reserved 
+
+Bit 3: 0 – Not Morphing 
+ 
+
+1 – Morphing (The VD is performing a 
+
+morphing activity: RAID level migration, 
+online capacity expansion, shrinking, 
+defragmenting, stripe size migration, 
+etc.) 
+
+1 – VD Not Consistent  
+
+Bit 4: 0 – VD Consistent 
+ 
+Bits 7-5: Reserved 
+ 
+All reserved bits MUST be set to 0. 
+ 
+ 
+NOTE-1: When the Morphing bit (Bit 3) is set, this 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+112 
+
+0x00 = Not Initialized 
+0x01 = Initialization in Progress 
+0x02 = Fully Initialized 
+0x03 = Reserved 
+
+VD cannot be imported to another controller from a 
+different vendor as the new controller will not be 
+able to determine the state or type of morphing 
+activity. It is RECOMMENDED that no voluntary 
+migrations of physical disks between controllers 
+from different vendors be allowed when VDs 
+associated with these physical disks are in a 
+Morphing state.  
+NOTE-2: The VD Not Consistent bit (Bit 4) MUST be 
+set when a controller cannot guarantee a VD is 
+consistent. The term consistent designates the 
+state when all writes to a VD by client computer 
+system, that are acknowledged as successfully 
+completed by the controller, have been correctly 
+written to the VD, including any redundancy 
+information (e.g., parity). This bit SHOULD be 
+cleared for a VD on a clean shutdown of the 
+system. The bit MAY also be cleared during idle 
+periods after a controller has determined that all 
+writes have been consistently written to the VD. 
+The bit SHOULD NOT be used as an actual cache 
+synchronization flag.  
+Bits 1-0: Initialization State 
+ 
+ 
+ 
+ 
+ 
+Bits 5-2:  Reserved 
+ 
+Bits 7-6: User Access Mode 
+ 
+ 
+ 
+ 
+denied) 
+ 
+NOTE: The Initialization in Progress state MAY be 
+used to indicate that the VD is being initialized 
+but is still available for read and/or write 
+access. Some controllers provide this capability. 
+This field is only valid for BVDs and when 
+VD_State = ‘Partially Optimal.’ This field 
+indicates the number of remaining drive failures 
+the VD may experience before leaving the 
+‘Partially Optimal’ state and entering the 
+‘Degraded State’ 
+Reserved Filled with 0xFF 
+This field MAY be used to contain a 16 byte ASCII 
+or Unicode string that is the name of the virtual 
+disk. Bit 2 of the VD_Type field MUST be used to 
+determine the Unicode or ASCII format of this 
+field. This field MAY match the volume name used 
+by some operating systems. If this field is not 
+used, all bytes MUST be set to zero.  
+
+0x00 = Read/Write 
+0x01 = Reserved 
+0x02 = Read Only 
+0x03 = Blocked (User reads and writes 
+
+Init_State 
+
+1 
+
+Partially_Optima
+l_Drive_Failures
+_Remaining 
+
+Reserved 
+VD_Name 
+
+1 
+
+13 
+16 
+
+ 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+113 
+
+5.9  Configuration Records 
+
+The Configuration Records section is local in context (i.e., relevant to physical disks where it is stored). It 
+is variable in length and the length is stored in the Configuration_Record_Section_Length field in the DDF 
+Header (Section 5.5). The Configuration_Record_Section_Length is implementation dependent and 
+MUST be managed during import/merge operations between different controller implementations.  A 
+physical disk MAY have multiple partitions. Thus, a physical disk MAY be simultaneously listed in multiple 
+configuration records. These configuration records MUST only be stored on the relevant (participating) 
+physical disks. This section contains multiple records and these records MUST be either: 
+
+a.  No Virtual Disk Configuration Records; 
+
+b.  All Virtual Disk Configuration Records; 
+
+c.  One Spare Assignment Record; 
+
+d.  All Virtual Disk Configuration Records and one a Spare Assignment Record; or 
+
+e.  All Vendor Unique Configuration Records. 
+
+The Spare Assignment Record MUST only be stored on the relevant physical disk. The number of 
+records stored on a physical disk MUST be one plus the value of the Max_Partitions field in the DDF 
+header (Section 5.5). One extra record is provided to allow writing a modified entry before invalidating 
+original. In the event that a Configuration Record section contains Max_Partitions Virtual Disk 
+Configuration Records and One Spare Assignment Record, there will not be enough space to allow 
+writing a modified entry before invalidating the original. It is up to the implementation to determine how to 
+handle this situation. In certain situations, an implementation MAY convert a revertible spare to invalidate 
+the Spare Assignment Record to provide the extra record for writing the new configuration. Another 
+method would be to copy the Spare Assignment Record to Workspace temporarily and to copy it back 
+after the new configuration record is written. To invalidate a Virtual Disk Configuration Record, a Spare 
+Assignment Record, or a Vendor Unique Configuration Record, 0xFFFFFFFF MUST be stored in the 
+Signature field of the record.  
+
+5.9.1  Virtual Disk Configuration Record  
+
+The size of VD configuration record MUST be the same as Configuration_Record_Length indicated in the 
+DDF header (Section 5.5). Each VD configuration record MUST adhere to the definitions and uses 
+described in Table 27.     
+
+Table 27: Virtual Disk Configuration Record Fields 
+
+Element       
+
+Signature 
+
+Description 
+
+Size 
+(Bytes) 
+4 
+
+For used entries, this field MUST be set to 
+the Unique Signature for 
+VD_Configuration_Record (Table 20).  
+ 
+For unused entries, this field MUST be set to 
+0xFFFFFFFF.  
+ 
+NOTE: Invalidating a used entry MAY be 
+accomplished by only writing 0xFFFFFFFF to 
+this field. This allows the possibility of 
+un-deleting a configuration entry. 
+CRC of the VD Configuration Record (Section 
+5.3) 
+
+CRC 
+
+4 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+114 
+
+VD_GUID 
+Timestamp 
+
+24 
+4 
+
+Sequence_Number 
+
+4 
+
+Reserved 
+Primary_Element_Count 
+
+Strip_Size 
+
+24 
+2 
+
+1 
+
+Primary_RAID_Level 
+RAID_Level_Qualifier 
+
+Secondary_Element_Count 
+
+Secondary_Element_Seq  
+
+Secondary_RAID_Level 
+
+Block_Count 
+
+1 
+1 
+
+1 
+
+1 
+
+1 
+
+8 
+
+VD GUID (Section 5.4.3) 
+Configuration or reconfiguration timestamp. 
+If this field is different than the timestamp 
+in the VD’s VD GUID, the configuration has 
+changed since the VD was created. New 
+timestamps MUST be greater than existing 
+timestamps. Timestamps SHOULD only be used as  
+chronological hints since they may not be 
+consistent across controllers 
+Sequence number for configuration record 
+changes. The initial value of this field MUST 
+be 0x00000001. Subsequent configuration 
+changes MUST increment this field by one. A 
+wraparound of the sequence number MUST be 
+indicated by the value 0x00000000.  
+Filled with 0Xff 
+The number of physical disks used in a basic 
+VD.  
+Stripe depth in (2^n)* Block_Size bytes 
+format where n is the value of the field. 
+ 
+Example (Block_Size = 512): 
+n=0 – 512B stripe depth 
+n=1 – 1KB stripe depth 
+n=2 – 2KB stripe depth 
+n=3 – 4KB stripe depth 
+n=7 – 64KB stripe depth 
+n=11 – 1MB stripe depth 
+etc. 
+ 
+Example (Block_Size = 4096): 
+n=0 – 4KB stripe depth 
+n=1 – 8KB stripe depth 
+n=2 – 16KB stripe depth 
+n=3 – 32KB stripe depth 
+n=7 – 512KB stripe depth 
+n=11 – 8MB stripe depth 
+RAID level of the BVD as defined in Table 1. 
+The RAID level qualifier as defined in Table 
+2. 
+The number of BVDs in a VD with a secondary 
+RAID level as defined in Section 4.3 (e.g., 
+RAID 50). For VDs without a secondary RAID 
+level, this field MUST be set to 1. 
+Position of current basic VD in secondary VD. 
+Valid only if secondary element count > 1. 
+The secondary RAID level as defined in Table 
+15. Valid only if Secondary_Element_Count > 
+1. 
+This field applies to the physical disk on 
+which the configuration record is stored. The 
+field states the size in blocks of the 
+partition on the physical disk that is 
+participating in the VD described by this 
+configuration record.  
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+115 
+
+VD_Size 
+
+Block_Size 
+
+8 
+
+2 
+
+Rotate parity count 
+
+1 
+
+Reserved 
+Associated_Spares 
+
+5 
+32 
+
+The size of the user addressable space in the 
+virtual disk. The size is stated in number of 
+blocks.  
+Logical block size of the virtual disk in 
+bytes. All physical disks participating in 
+this virtual disk MUST have the same value in 
+the Block_Size fields of their associated 
+Physical Disk Entries (See Section 5.7.1). 
+Number of stripes before parity rotation for 
+RAID 5R stored here as a power of 2 
+ 
+Value is n, n=0 to 31  
+ 
+0xFF means not used (or n=0) 
+Filled with 0xFF 
+This field contains eight 4-byte entries for 
+associated spare physical disks. Each used 
+entry MUST contain the PD_Reference defined 
+in the Physical Disk Entry (Section 5.7.1) 
+for the associated spare physical disk. 
+Unused entries MUST be set to 0xFFFFFFFF. 
+ 
+Bytes 0-3: Spare Entry 0 
+Bytes 4-7: Spare Entry 1 
+Bytes 8-11: Spare Entry 2 
+Bytes 12-15: Spare Entry 3 
+Bytes 16-19: Spare Entry 4 
+Bytes 20-23: Spare Entry 5 
+Bytes 24-27: Spare Entry 6 
+Bytes 28-31: Spare Entry 7  
+ 
+NOTE: 
+This field is used to detect missing 
+dedicated spares as Spares Assignment Records 
+are local.  
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+116 
+
+Cache Policies & 
+Parameters 
+
+8 
+
+BG_Rate 
+
+1 
+
+Reserved 
+
+3 
+
+1-Vendor specific caching algorithm 
+
+Cache policies for the VD. Cache policies, 
+algorithms and parameters are implementation 
+dependent. Therefore, bytes 1 through 7 are 
+vendor specific. Byte 0 is a bit field where 
+the bits are defined as: 
+ 
+Bit0: 0-WriteThrough 
+      1-Writeback 
+Bit1: 0-Always (ignored if Bit0=0) 
+      1-Adaptive (ignored if Bit0=0) 
+Bit2: 0-No Read Ahead 
+      1-Read Ahead 
+Bit3: 0-Always (ignored if Bit2=0) 
+      1-Adaptive (ignored if Bit2=0) 
+Bit4: 0-No write caching if battery low or 
+      not present 
+      1-Write caching allowed if battery low 
+      or not present 
+Bit5: 0-No write caching allowed 
+      1-Write caching allowed 
+Bit6: 0-No read caching allowed 
+      1-Read caching allowed 
+Bit7: 0-No vendor specific caching algorithm 
+ 
+ 
+NOTE-1: Bits 4-6 are master enable/disable 
+settings for cache parameters.  
+ 
+NOTE-2: If bit7 is set, then bits 0-3 SHOULD 
+left clear and ignored. Bits 4-6 SHOULD still 
+be used. 
+ 
+NOTE-3: During Vendor migration, if bit7 is 
+found set, then the user SHOULD be notified 
+and bit7 SHOULD be cleared. Bits 0-3 SHOULD 
+be set to controller default and bits 4-6 
+SHOULD be preserved. 
+This field is used to assign background task 
+priorities to individual VDs. Examples of 
+background tasks are: initialization, RAID 
+level migration, expansion, etc. If the field 
+is set to 0xFF, no background task rate has 
+been set for this VD and the controller 
+defaults SHOULD be used. If the field has a 
+value of 0x00 through 0xFA, the VD SHOULD be 
+assigned this relative priority for all 
+background tasks. 0x00 is the lowest priority 
+and 0xFA is the highest. 
+ 
+NOTE: The actual weighting of the background 
+task priorities is implementation dependent. 
+Filled with 0xFF 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+117 
+
+MDF Parity Disks 
+
+MDF Parity Generator 
+Polynomial 
+
+1 
+
+2 
+
+Reserved 
+MDF Constant Generation 
+Method 
+
+1 
+1 
+
+Reserved 
+Reserved 
+V0 
+V1 
+V2 
+V3 
+Vendor Specific Scratch 
+Space 
+
+47 
+192 
+32 
+32 
+16 
+16 
+32 
+
+Number of Parity disks in this configuration. 
+Minimum value is 2 and Maximum value is 127.  
+ 
+This field is reserved if the Primary RAID 
+Level for this configuration is NOT 0x7. 
+This field is used to specify the polynomial 
+used to generate the Galois Field for Parity 
+computation for this configuration.  
+ 
+Valid values are 0x11dh, 0x169h, 0x1e7h, 
+0x12bh, 0x165h, 0x163h, 0x18dh, 0x12dh, 
+0x15fh, 0x1c3h, 0x1a9h, 0x187h, 0x14dh, 
+0x1cfh, 0x1f5h, and 0x171h.  
+ 
+This field is reserved if the Primary RAID 
+Level Qualifier for this configuration is NOT 
+0x7. 
+ 
+This field is used to specify the method used 
+to generate constants that are used to 
+compute parity. 
+Value is n, and where n can be one of the 
+following values: 
+0x00 – Vandermonde Method as defined in this 
+specification; or, 
+0x05 - Vendor Defined. 
+All other values are reserved.  
+ 
+This field is reserved if the Primary RAID 
+Level Qualifier for this configuration is NOT 
+0x7. 
+Filled with 0xFF 
+Filled with 0xFF 
+Filled with 0xFF – Reserved for future use 
+Filled with 0xFF – Reserved for future use 
+Filled with 0xFF – Reserved for future use 
+Filled with 0xFF – Reserved for future use 
+Vendor unique information. All bytes in this 
+field MUST be set to 0xFF when not used by 
+the implementation. 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+118 
+
+Physical_Disk_Sequence 
+
+vari-
+able 
+ 
+
+Starting_Block 
+
+vari-
+able 
+
+This field gives the sequence of physical 
+disks in the BVD. This field contains 
+multiple 4-byte entries. Each used entry MUST 
+be a PD_Reference from a Physical_Disk_Entry 
+(Section 5.7.1). Unused entries MUST be 
+filled with 0xFFFFFFFF.  
+ 
+Used entries provide the primary element 
+sequence in ascending order. For the BVD, the 
+number of used entries MUST equal the 
+Primary_Element_Count in the 
+Virtual_Disk_Configuration_Record for the 
+BVD.  
+ 
+If a physical disk that was part of this VD 
+has been removed from the VD, reconfigured as 
+part of another VD, and then returned to the 
+system containing the original VD, the 
+PD_Reference entry for the returned physical 
+disk MUST be set to 0x00000000. This is to 
+prevent the controller from erroneously 
+reading the data from the replaced drive as 
+part of the current VD. 
+ 
+NOTE: This is a variable size field. Its size 
+is determined by the following formula: 
+ 
+Max_Primary Element_Entries * 4 
+This field gives the starting LBAs for the 
+partitions of the physical disks 
+participating in the BVD.  This field is 
+variable in size and is comprised of 8-byte 
+entries.  
+ 
+Each entry contains an 8-byte LBA. Each entry 
+corresponds to the physical drive with the 
+PD_Reference stored in the same entry index 
+in Physical_Disk_Sequence. Each entry MUST 
+contain the starting LBA of its corresponding 
+physical disk’s partition that is part of the 
+BVD.  
+ 
+Unused entries MUST be filled with 
+0xFFFFFFFFFFFFFFFF.  
+ 
+NOTE: This is a variable size field. Its size 
+is determined by the following formula: 
+ 
+Max_Primary_Element_Entries * 8  
+
+ 
+
+5.9.2  Vendor Unique Configuration Record 
+
+The vendor unique configuration record allows proprietary implementations within DDF structures. Its size 
+MUST be the same as the Configuration_Record_Length field of the DDF header (Section 5.5). This 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+119 
+
+structure is vendor specific except for the first 32-bytes which MUST adhere to the definitions and uses 
+described in Table 28.  
+
+Table 28: Vendor Unique Configuration Record Mandatory Fields 
+
+Description 
+
+Size 
+(Bytes) 
+4 
+
+4 
+
+Unique Signature for VU_Configuration_Record 
+(Table 20)  
+CRC of the Vendor_Unique_Configuration_Record 
+(Section 5.3)  
+
+24 
+
+VD GUID (5.4.3) 
+
+5.9.3  Spare Assignment Record 
+
+A Spare Assignment Record MUST be present on a physical disk only if the physical disk is a spare. The 
+length of this record MUST be equal to the value in the Configuration_Record_Length field of the DDF 
+Header (Section 5.5). Spare Assignment Records MUST adhere to the filed definitions and uses 
+described in Table 29. 
+
+Table 29:  Spare Assignment Record Fields 
+
+Description 
+
+Size 
+(Bytes)
+4 
+
+4 
+4 
+7 
+
+Unique Signature for Spare_Assignment_Record (Table 
+20) 
+CRC of the Spare_Assignment_Record (Section 5.3) 
+ 
+0xFFFFFFFFFFFFFF 
+
+Element       
+
+Signature 
+
+CRC 
+
+VD_GUID 
+ 
+
+  
+
+ 
+
+Element       
+
+Signature 
+
+CRC 
+Timestamp 
+Reserved 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+120 
+
+Spare_Type 
+
+1 
+
+Populated_SAEs 
+Max_SAE_Supported 
+Reserved 
+Spare_Assignment_Entrie
+s 
+
+2 
+2 
+8 
+vari-
+able 
+
+Bit0: 0 – Global 
+      1 – Dedicated 
+Bit1: 0 – Committable 
+      1 – Revertible 
+Bit2: 0 – Not Active 
+      1 – Active 
+Bit3: 0 – No Enclosure Affinity 
+      1 – Enclosure Affinity 
+Bits 7-4: Reserved 
+ 
+The reserved bits MUST be set to 0. 
+ 
+NOTE-1: Committable spares (Bit1 = 0) become 
+permanent members of VDs after a rebuild. Revertible 
+(Bit1 = 1) spares revert back to Spare status after 
+the replacement of the original failed physical disk. 
+An import, merge, or roaming action MAY require 
+commitment of an active (failed-over) revertible 
+spare. 
+NOTE-2: An active spare is currently host user data 
+on a VD for failed physical disk. 
+NOTE-3: A spare with Enclosure Affinity MAY only be 
+used as a spare for VDs that reside on disks in the 
+same enclosure as the spare. Keeping track of which 
+disks are associated with a particular enclosure is 
+implementation dependent. 
+Number of Spare Assignment Entries used 
+Maximum number of SAE supported by vendor. 
+Filled with 0xFF 
+Packed 32-byte spare assignment entries for spare 
+physical disks (See Section 5.9.3.1). All bytes of 
+unused entries MUST be set to 0xFF. 
+ 
+ 
+NOTE: This is a variable size field which depends on 
+Configuration_Record_Length. It is equal to 
+Configuration_Record_Length minus 32 bytes. 
+
+ 
+
+ 
+
+5.9.3.1  Spare Assignment Entry 
+
+Spare Assignment Entries identify the VDs associated with a spare disk. The meaning and use of the 
+Spare Assignment Entries is defined by Spare Type field of the Spare Assignment Record. Details on the 
+use of Spare Assignment Entries are given in Section 5.9.3.2.  Spare Assignment Entries MUST adhere 
+to the field definitions and uses described in Table 30. 
+
+Table 30:  Spare Assignment Entry Fields 
+
+Element       
+
+VD GUID 
+
+Description 
+
+Size 
+(Bytes) 
+24 
+
+VD GUID of a VD to which this spare physical disk is 
+assigned  
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+121 
+
+Secondary_Element 
+
+Reserved 
+ 
+
+2 
+
+6 
+
+VD Secondary Element number to which this spare 
+physical disk is assigned. If the spare is not 
+assigned to a particular secondary element, this 
+field MUST be set to 0xFFFF.  
+Filled with 0xFF 
+
+5.9.3.2  Spare Types and Spare Assignment Entry Details 
+ 
+
+5.9.3.2.1 Global Spares (Spare_Type: Bit0 = 0) 
+
+For non-active global spares (Spare_Type: Bit2 = 0), all spare assignment entries in the Spare 
+Assignment Record MUST be unused. 
+
+For active revertible global spares (Spare_Type: Bit1 = 1, Bit2 = 1), a Spare Assignment Entry MUST be 
+present for each VD for which the spare is currently hosting user data. When a Spare Assignment Entry is 
+added to a disk’s Spare Assignment Record, a Virtual Disk Configuration Record MUST be added on the 
+spare disk for the VD indicated by the VD GUID in the Spare Assignment Entry. All Virtual Disk 
+Configuration Records associated with the VD on other disks MUST be updated to reflect that the spare 
+is now part of the VD and has replaced the failed disk. Bit2 of the PD_State field in the Physical Disk 
+Entry associated with the spare disk MUST be set to 1 (Rebuilding) while a VD’s data is being rebuilt on 
+the spare disk.  
+
+For an active revertible global spare, when an original failed disk for which the spare is hosting user data 
+is replaced, Bit3 of the PD_State field in the Physical Disk Entry associated with the replacement disk 
+MUST be set to 1 (Transition) while a VD’s data is being copied to the replacement disk. Once the copy 
+operation is completed, all Virtual Disk Configuration Records associated with the VD indicated by the VD 
+GUID in the Spare Assignment Entry MUST be updated to reflect that the spare is no longer part of the 
+VD and that the replacement disk is now part of the VD. The Spare Assignment Entry associated with the 
+VD GUID MUST be deleted. The Virtual Disk Configuration record on the active revertible global spare 
+disk associated with the VD GUID MUST be deleted. 
+
+For committable global spares (Spare Type: Bit1 = 0), once the disk joins a VD, it becomes a permanent 
+member of the VD and no Spare Assignment Record will be present for the VD. 
+
+5.9.3.2.2 Dedicated Spares (Spare_Type: Bit0 = 1) 
+
+For dedicated spares, a Spare Assignment Entry MUST be present for each VD for which the dedicated 
+spare may serve as a replacement disk. 
+
+For active dedicated spares (Spare_Type: Bit2 = 1), a Virtual Disk Configuration Record MUST be 
+present for each VD for which the spare is replacing a failed disk. When a Virtual Disk Configuration 
+Record is placed on an active dedicated spare, all Virtual Disk Configuration Records associated with the 
+same VD on other disks MUST be updated to reflect that the spare is now part of the VD and has 
+replaced the failed disk. Bit2 of the PD_State field in the Physical Disk Entry associated with the spare 
+disk MUST be set to 1 (Rebuilding) while a VD’s data is being rebuilt on the spare disk. 
+
+For an active revertible dedicated spare, when an original failed disk for which the spare is hosting user 
+data is replaced, Bit3 of the PD_State field in the Physical Disk Entry associated with the replacement 
+disk MUST be set to 1 (Transition) while a VD’s data is being copied to the replacement disk. Once the 
+copy operation is completed, all Virtual Disk Configuration Records associated with the VD indicated by 
+the VD GUID in the Spare Assignment Entry MUST be updated to reflect that the spare is no longer part 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+122 
+
+of the VD and that the replacement disk is now part of the VD. The Virtual Disk Configuration record on 
+the active revertible dedicated spare disk associated with the VD GUID MUST be deleted. 
+
+5.10  For committable dedicated spares (Spare Type: Bit1 = 0), once 
+the disk joins a VD, it becomes a permanent member of the VD 
+and the Spare Assignment Record on the spare associated with 
+the VD MUST be deleted.Physical Disk Data 
+
+This section is local in context (i.e., only relevant to the physical disk on which it is stored). It stores the 
+Physical Disk GUID and the Reference Number that is used in the Physical Disk Entry (see Section 5.7.1) 
+for this physical disk. If the Physical Disk GUID is not available (possibly due to a missing or inaccessible 
+disk serial number) or not usable, then a GUID MUST be generated (see Section 5.4.2) and the 
+Forced_PD_GUID_Flag set to 1. Physical Disk Data sections MUST adhere to the field definitions and 
+uses described in Table 31. 
+
+Table 31:  Physical Disk Data Fields 
+
+Description 
+
+ 
+
+Element       
+
+Signature 
+CRC 
+
+PD_GUID 
+
+PD_Reference 
+
+Size 
+(Bytes) 
+4 
+4 
+
+24 
+
+4 
+
+Unique signature for Physical_Disk_Data (Table 20) 
+CRC of the Physical_Disk_Data section (Section 
+5.3) 
+Physical Disk GUID for this physical disk (Section 
+5.4.2) 
+Physical Disk Reference Number.  
+ 
+For disks accessed by SCSI commands, the reference 
+number MUST be built by computing a 32-bit CRC of 
+the data contained in EVPD page 80. 
+ 
+For ATA and SATA disks, the reference number MUST 
+be built by computing a 32-bit CRC of the data 
+returned by the Identify Device command. 
+ 
+The reference number is global across the 
+controller configuration and each disk on the 
+controller MUST have a unique reference number. In 
+case of conflict, a new value MUST be calculated. 
+The method is implementation dependent but MUST 
+insure that all disks in the configuration have 
+unique PD_Reference values.  This field MUST be 
+managed when importing configured disk groups to 
+insure the PD_Reference values remain unique.  
+ 
+The values 0x00000000 and 0xFFFFFFFF are reserved 
+and MUST not be used as PD_Reference values. 
+0x00 = No 
+0x01 = Yes  
+ 
+The Forced_Ref_Flag is set when the PD_Reference 
+is generated in a manner different than described 
+in the PD_Reference field description. This 
+situation occurs in the event two or more 
+PD_References for different disks have the same 
+
+Forced_Ref_Flag 
+
+1 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+123 
+
+Forced_PD_GUID_Flag 
+
+1 
+
+Vendor Specific Scratch 
+Space 
+
+32 
+
+Reserved 
+ 
+
+442 
+
+5.11 Bad Block Management Log 
+
+value. 
+ 
+0x00 = No 
+0x01 = Yes 
+ 
+Once a Forced PD GUID is created for a physical 
+disk (see Section 5.4.2), the Forced PD GUID MUST 
+be associated with the physical disk as long as 
+the disk participates in the configuration. 
+Vendor unique information. All bytes in this field 
+MUST be set to 0xFF when not used by the 
+implementation. 
+Filled with 0xFF 
+
+This section is local in context (i.e., only relevant to the physical disk where it is stored). It is an 
+OPTIONAL section that allows block mapping and reassignment for defective blocks or the marking of 
+blocks that cannot be recovered during a rebuild or recovery operation due to a media error. The Bad 
+Block Management (BBM) Log section must adhere to the field definitions and uses described in Table 
+32. 
+
+Table 32:  Bad Block Management Log Fields 
+
+Element       
+
+Signature 
+
+CRC 
+
+Entry_Count 
+
+Reserved_Spare_Block_Co
+unt 
+Reserved 
+First_Spare_LBA 
+Mapped_Block_Entries  
+
+Description 
+
+Size 
+(Bytes) 
+4 
+
+4 
+
+4 
+
+4 
+
+8 
+8 
+variab
+le 
+
+Unique Signature for Bad_Block_Management_Log 
+(Table 20) 
+CRC for the BBM Log (Section 5.3). The CRC covers 
+the entire Bad_Block_Management_Log section. 
+Count for valid mapped/marked block entries. When 
+there are no mapped/marked blocks, this field MUST 
+be set to 0x00000000. The maximum entry for this 
+field is the smaller of Max_Mapped_Block_Entries 
+or Reserved_Spare_Block_Count. 
+Up to 0xFFFFFFFF. The value of this field is 
+implementation dependent. 
+Filled with 0xFF 
+LBA of first spare block. 
+Packed 16-byte entries for mapped LBAs (see 
+Section 5.11.1). The entries MUST be sequentially 
+populated. Unused entries must be filed with 0xFF. 
+ 
+Note: This is a variable sized field. Its size is 
+determined by the following formula: 
+ 
+ Max_Mapped_Block_Entries * 16 
+
+ 
+
+ 
+
+5.11.1 Mapped/Marked Block Entry 
+
+A Mapped/Marked Block Entry identifies a contiguous group of blocks that are remapped to another 
+section on the physical disk or marked as unrecoverable due to a media error. Mapped/Marked Block 
+Entries MUST adhere to the field definitions and uses described in Table 33.  
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+124 
+
+ Table 33:  Mapped/Marked Block Entry Fields 
+
+Element       
+
+Defective_Block_Start 
+
+Description 
+
+Size 
+(Bytes) 
+8 
+
+Spare_Block_Offset 
+
+4 
+
+The LBA of the first defective block in a 
+contiguous group of defective blocks that are 
+remapped or marked as unrecoverable. 
+If this field is set to 0xFFFFFFFF, the blocks 
+indicated by this Mapped/Marked Block Entry are 
+marked as unreadable due to media error. If this 
+field is not set to 0xFFFFFFFF, the blocks MUST be 
+remapped to a new location. The field contains the 
+offset from the First_Spare_LBA where the group of 
+defect blocks MUST be remapped. 
+Number of blocks to be remapped or marked as 
+unrecoverable. 
+Filled with 0xFF 
+
+Remapped_Marked_Count 
+
+Reserved 
+
+2 
+
+2 
+
+5.12  Diagnostic Space 
+
+ 
+
+ 
+
+The Diagnostic Space section is local in context. This section is OPTIONAL. If implemented, the size of 
+this section is stated in the Diagnostic_Space_Length field of the DDF Header (Section 5.5). The section 
+MAY be used for destructive read/write tests on the physical disk. 
+
+5.13  Vendor Specific Logs 
+
+The Vendor Specific Logs section is OPTIONAL. The structure of this section is implementation/vendor 
+specific except for the first 32 bytes which are used for mandatory fields. The first 32 bytes MUST adhere 
+to the field definitions and uses described in Table 34. 
+
+Table 34:  Vendor Specific Logs Mandatory Fields 
+
+Description 
+
+Element       
+
+Signature 
+
+CRC 
+
+Log_Owner 
+
+(Size 
+Bytes) 
+4 
+
+4 
+
+8 
+
+Reserved 
+
+16 
+
+Unique signature for Vendor_Specific_Logs section 
+(Table 20) 
+CRC for the Vendor Specific Logs section (Section 
+0) The CRC is covers entire Vendor_Specific_Logs 
+section. Any unused bytes in the section MUST be 
+filled with 0xFF. 
+T10 vendor ID of the log owner. If the vendor 
+specific logs are used, this field MUST be 
+populated with the T10 Vendor ID of the vendor 
+that created the log. It MUST be set to 
+0xFFFFFFFFFFFFFFFF when the logs are empty or not 
+used. 
+Filled with 0xFF 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+125 
+
+ 
+
+Common RAID Disk Data Format (DDF) 
+Version 2.0 rev 19 
+
+SNIA Technical Position 
+
+126 
+
+
