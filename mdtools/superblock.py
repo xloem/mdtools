@@ -72,12 +72,13 @@ class Superblock(namedfilestruct.NamedFileStruct):
         pad3 = '32s', # always written zero
 
         # device roles (positions in array) area follows, 1 per device
+        #dev_roles = '{max_dev}H'
     )
     dev_role_field = 'H' # 0xfffe means spare; 0xffff means faulty; others are position/role
     def read(self, *params, **kwparams):
         super().read(*params, **kwparams)
         assert self.values['magic'] == 0xa92b4efc
-        self.values['dev_roles'] = list(struct.iter_unpack('H', self.fileobj.read(2 * self.max_dev)))
+        self.values['dev_roles'] = struct.unpack(f'{self.max_dev}H', self.fileobj.read(2 * self.max_dev))
 
 
 if __name__ == '__main__':
