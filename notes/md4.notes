@@ -1,0 +1,7 @@
+previous state:
+	- sde1 was a spare
+
+current state, incorrect:
+	2 drives have a recovery offset
+	none are marked spares
+	
